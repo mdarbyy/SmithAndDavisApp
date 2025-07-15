@@ -1,0 +1,3 @@
+rails g scaffold SalesPerson firstName:string lastName:string employmentDate:datetime
+
+rails g scaffold SalesRecord itemName:string itemPrice:decimal sellDate:datetime SalesPerson:references

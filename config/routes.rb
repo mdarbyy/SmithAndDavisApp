@@ -1,6 +1,18 @@
 Rails.application.routes.draw do
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+  
+  devise_for :users, controllers: {
+    sessions: 'users/sessions',
+    registrations: 'users/registrations'
+  }
 
-  # Defines the root path route ("/")
-  # root "articles#index"
+  authenticated :user do
+
+    resources :settings
+    resources :users
+
+    post 'admin/users', to: 'users#create', as: 'admin_create_user'
+    get 'static_pages/dashboard', to: 'static_pages#dashboard', as: 'dashboard'
+  end
+
+  root "users#index"
 end
