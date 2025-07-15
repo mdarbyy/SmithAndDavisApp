@@ -10,7 +10,7 @@
   </div>
 
   <div class="form-group mb-3">
-    <%= f.label :password_confirmation, class: 'form-label' %><br />
+    <%= f.label :password_confirmation, "Retype Password", class: 'form-label' %><br />
     <%= f.password_field :password_confirmation, class: 'form-control' %>
   </div>
 
@@ -20,6 +20,6 @@
 
   <div class="text-center mt-3">
     Already have an account? 
-    <%= link_to "Sign in", new_session_path(resource_name), class: "link-primary" %>
+    <%= link_to "Sign in", new_session_path(resource_name), class: "link-primary", style:"color: #193856 !important" %>
   </div>
 <% end %>

@@ -7,6 +7,7 @@ Rails.application.routes.draw do
 
   authenticated :user do
 
+    resources :sales_people
     resources :settings
     resources :users
 
@@ -14,5 +15,5 @@ Rails.application.routes.draw do
     get 'static_pages/dashboard', to: 'static_pages#dashboard', as: 'dashboard'
   end
 
-  root "users#index"
+  root "static_pages#dashboard"
 end

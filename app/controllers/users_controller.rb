@@ -53,7 +53,7 @@ class UsersController < ApplicationController
 
   def destroy
     @user.destroy
-    redirect_to users_url, success: 'User was deleted'
+    redirect_to users_path, success: 'User was deleted'
   end
 
   private
