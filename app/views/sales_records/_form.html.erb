@@ -1,0 +1,156 @@
+<%= form_with url: create_multiple_sales_records_path, method: :post, local: true, id: "multi-sales-record-form" do %>
+  
+  <div class="row g-3 mb-3 align-items-center">
+    <div class="col-12">
+      <label class="col-form-label"><strong>Sales Person</strong></label>
+      <select id="shared_sales_person" class="form-control">
+        <%= options_from_collection_for_select(SalesPerson.all.order(:first_name, :last_name), :id, ->(sp) { "#{sp.first_name} #{sp.last_name}" }) %>
+      </select>
+    </div>
+  </div>
+  
+  <div class="row g-3 mb-3 align-items-center">
+    <div class="col-12">
+      <label class="col-form-label"><strong>Sell Date</strong></label>
+      <input type="date" id="shared_sell_date" class="form-control" value="<%= Date.today.strftime('%Y-%m-%d') %>" />
+    </div>
+  </div>
+
+  <template id="sales-record-template">
+    <div class="wrapper mb-3">
+      <hr class="separator" />
+      <div class="row g-3 align-items-center">
+        <div class="col-5">
+          <label class="col-form-label"><strong>Item Name</strong></label>
+          <input type="text" name="sales_records[__TIMESTAMP__][item_name]" class="form-control" />
+        </div>
+        <div class="col-5">
+          <label class="col-form-label"><strong>Item Price</strong></label>
+          <input type="number" name="sales_records[__TIMESTAMP__][item_price]" class="form-control" />
+        </div>
+        <div class="col-1">
+          <button type="button" class="btn btn-delete remove-item-btn" style="margin-top: 35px;">X</button>
+        </div>
+      </div>
+
+      <!-- These hidden inputs will get set via JS before submit -->
+      <input type="hidden" name="sales_records[__TIMESTAMP__][sales_person_id]" class="hidden-sales-person" />
+      <input type="hidden" name="sales_records[__TIMESTAMP__][sell_date]" class="hidden-sell-date" />
+    </div>
+  </template>
+
+  <!-- Where items go -->
+  <div id="item-list"></div>
+
+  <!-- Add New Item Button -->
+  <div class="row g-3 mt-3 mb-3 align-items-center" id="add-item-row">
+    <div class="col-12 d-flex justify-content-center">
+      <button type="button" id="add-item-btn" class="btn btn-main">Add New Item</button>
+    </div>
+  </div>
+
+  <!-- Submit Button -->
+  <div class="row" id="submit-btn-row" style="display: none;">
+    <div class="col-12 d-flex justify-content-end">
+      <%= submit_tag 'Submit', class: 'btn btn-main', id: 'submit_button', onclick:"show_spinner()" %>
+    </div>
+  </div>
+
+<% end %>
+
+<script>
+  
+  $(document).ready(function() {
+    const addItemBtn = document.getElementById("add-item-btn");
+    const itemList = document.getElementById("item-list");
+    const template = document.getElementById("sales-record-template").innerHTML;
+    const form = document.getElementById("multi-sales-record-form");
+
+    const sharedSalesPerson = document.getElementById("shared_sales_person");
+    const sharedSellDate = document.getElementById("shared_sell_date");
+    const addItemRow = document.getElementById("add-item-row");
+    const submitBtnRow = document.getElementById("submit-btn-row");
+
+    // Add Item
+    addItemBtn.addEventListener("click", function () {
+      const timestamp = Date.now();
+      const newItemHTML = template.replace(/__TIMESTAMP__/g, timestamp);
+      itemList.insertAdjacentHTML("beforeend", newItemHTML);
+      updateSubmitButtonVisibility();
+    });
+
+    // Remove Item
+    itemList.addEventListener("click", function (e) {
+      if (e.target.classList.contains("remove-item-btn")) {
+        e.preventDefault();
+        const wrapper = e.target.closest(".wrapper");
+        if (wrapper) wrapper.remove();
+        updateSubmitButtonVisibility();
+      }
+    });
+
+    itemList.addEventListener("input", function (e) {
+      if (e.target.matches("input[name*='[item_name]'], input[name*='[item_price]']")) {
+        updateSubmitButtonVisibility();
+      }
+    });
+
+    const sellDateInput = document.getElementById("shared_sell_date");
+
+    function getEasternDate() {
+      const DateTime = luxon.DateTime;
+      return DateTime.now().setZone("America/New_York").toFormat("yyyy-LL-dd");
+    }
+
+    // Set today's date on load if field is empty
+    if (sellDateInput && !sellDateInput.value) {
+      sellDateInput.value = getEasternDate();
+    }
+
+    // Reset to today's date in ET if field is cleared
+    sellDateInput.addEventListener("change", function () {
+      if (!sellDateInput.value) {
+        sellDateInput.value = getEasternDate();
+        toggleVisibility();
+      }
+    });
+
+    function updateSubmitButtonVisibility() {
+      const itemWrappers = document.querySelectorAll("#item-list .wrapper");
+      let hasValidItem = false;
+
+      itemWrappers.forEach(wrapper => {
+        const name = wrapper.querySelector("input[name*='[item_name]']").value.trim();
+        const price = wrapper.querySelector("input[name*='[item_price]']").value.trim();
+
+        if (name !== "" && price !== "") {
+          hasValidItem = true;
+        }
+      });
+
+      submitBtnRow.style.display = hasValidItem ? "flex" : "none";
+    }
+
+    // Inject shared values on submit
+    form.addEventListener("submit", function (event) {
+      if (!sharedSalesPerson.value || !sharedSellDate.value) {
+        alert("Sales Person and Sell Date are required.");
+        event.preventDefault();
+        return false;
+      }
+
+      document.querySelectorAll(".hidden-sales-person").forEach(input => {
+        input.value = sharedSalesPerson.value;
+      });
+
+      document.querySelectorAll(".hidden-sell-date").forEach(input => {
+        input.value = sharedSellDate.value;
+      });
+    });
+
+    //click the button once so that its shown on page load
+    addItemBtn.click();
+  });
+  
+  
+</script>

@@ -2,10 +2,10 @@
 
   <div class="row">
     <div class="col-4 d-flex justify-content-start">
-      <%= button_to 'Add Sales People', new_sales_person_path, method: :get, class: 'btn btn-main btn-left' %>
+      <%= button_to 'Add Sales Record', new_sales_record_path, method: :get, class: 'btn btn-main btn-left' %>
     </div>
     <div class="col-4 d-flex justify-content-center">
-      <h1>Sales People</h1>
+      <h1>Sales Records</h1>
     </div>
     <div class="col-4 d-flex justify-content-end">
       <form role="search" class="d-flex search-form">
@@ -17,17 +17,20 @@
   <div class="card m-1 p-2" id="content-main">
     <div id="content-scroll">
 
-      <% if @sales_people.present? and @sales_people.count > 0 %>
+      <% if @sales_records.present? and @sales_records.count > 0 %>
         <table class="table content" id="content-table">
           <thead>
             <tr>
-              <th class="stick" scope="col"><a>Name</a></th>
+              <th class="stick" scope="col"><a>Item Name</a></th>
+              <th class="stick" scope="col"><a>Item Price</a></th>
+              <th class="stick" scope="col"><a>Sales Person</a></th>
+              <th class="stick" scope="col"><a>Sell Date</a></th>
               <th class="stick" scope="col"><a></a></th>
             </tr>
           </thead>
           <tbody id="content-table-body">
-            <% @sales_people.each do |sales_person| %>
-              <%= render 'sales_person', sales_person: sales_person %>
+            <% @sales_records.each do |sales_record| %>
+              <%= render 'sales_record', sales_record: sales_record %>
             <% end %>
           </tbody>
         </table>
@@ -35,7 +38,10 @@
         <table class="table content">
           <thead>
             <tr>
-              <th class="stick" scope="col"><a>Name</a></th>
+              <th class="stick" scope="col"><a>Item Name</a></th>
+              <th class="stick" scope="col"><a>Item Price</a></th>
+              <th class="stick" scope="col"><a>Sales Person</a></th>
+              <th class="stick" scope="col"><a>Sell Date</a></th>
               <th class="stick" scope="col"><a></a></th>
             </tr>
           </thead>
@@ -52,7 +58,7 @@
     </div>
 
     <div style="text-align: center;" id="recordCount">
-      <b>Displaying <span id="currentCount">0</span> of <%= @total_records %> Sales People</b>
+      <b>Displaying <span id="currentCount">0</span> of <%= @total_records %> sales records</b>
     </div>
   </div>
 </div>
@@ -91,7 +97,7 @@
     if (isLoading) return;
     console.log("loading");
     $.ajax({
-      url: "sales_people",
+      url: "sales_records",
       data: { offset: offset1 },
       type: 'GET',
       dataType: 'script',

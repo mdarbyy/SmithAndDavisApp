@@ -17,6 +17,8 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js"></script>
+
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
 
@@ -132,6 +134,10 @@
       overflow: hidden;
     }
 
+    .form-select {
+      background-color: #193856;
+    }
+
     .brand {
       font-family: 'Handjet';
     }
@@ -241,11 +247,26 @@
       color: #052748;
     }
 
+    .scrollable-form, #content-scroll {
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+
+    .scrollable-form::-webkit-scrollbar, #content-scroll::-webkit-scrollbar {
+      display: none; /* For Chrome, Safari, and Edge */
+    }
+
     .search-form {
       height: 40px;
       margin-top: 5px;
       max-width: 300px;
       width: 100%;
+    }
+
+    .separator {
+      border: 2px solid #964642;
+      margin-top: 20px;
+      margin-bottom: 20px;
     }
 
     .unauthenticated {
@@ -288,6 +309,9 @@
                 </li>
                 <li class="list-group-item">
                   <%= link_to "Sales People", sales_people_path, class: "dashboard-link sidebar-nav-link #{'active' if current_page?(sales_people_path)}" %>
+                </li>
+                <li class="list-group-item">
+                  <%= link_to "Sales Records", sales_records_path, class: "dashboard-link sidebar-nav-link #{'active' if current_page?(sales_records_path)}" %>
                 </li>
                 <li class="list-group-item">
                   <%= link_to "Users", users_path, class: "dashboard-link sidebar-nav-link #{'active' if current_page?(users_path)}" %>

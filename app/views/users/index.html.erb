@@ -82,7 +82,7 @@
 
     // Check if current count is less than total records before calling loadMoreRecords
     if (currentCount < totalRecords) {
-      if ($("#content-scroll").scrollTop() >= $("#content-table").height() - $("#content-scroll").height() && !isLoading1) {
+      if ($("#content-scroll").scrollTop() >= $("#content-table").height() - $("#content-scroll").height() && !isLoading) {
         loadMoreRecords();
       }
     }
