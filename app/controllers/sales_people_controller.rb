@@ -5,7 +5,7 @@ class SalesPeopleController < ApplicationController
   def index
     @limit = Setting.first.entity_limit
     offset = params[:offset].to_i || 0
-    @sales_people = SalesPerson.all.limit(@limit).offset(offset)
+    @sales_people = SalesPerson.all.limit(@limit).offset(offset).order(first_name: :asc, last_name: :asc)
     @total_records = SalesPerson.all.count
 
     respond_to do |format|

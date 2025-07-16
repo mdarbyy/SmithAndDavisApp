@@ -5,7 +5,7 @@ class UsersController < ApplicationController
   def index
     @limit = Setting.first.entity_limit
     offset = params[:offset].to_i || 0
-    @users = User.all.limit(@limit).offset(offset)
+    @users = User.all.limit(@limit).offset(offset).order(email: :asc)
     @total_records = User.all.count
 
     respond_to do |format|

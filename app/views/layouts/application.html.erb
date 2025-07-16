@@ -211,7 +211,7 @@
     }
 
     .image-section {
-      background-image: url('<%= asset_path("sign_in.jpg") %>');
+      background-image: url('<%= asset_path("sign_in.png") %>');
       background-position: center;
       background-repeat: no-repeat;
       background-size: cover;
@@ -392,6 +392,17 @@
   function show_spinner(){
     document.getElementById("overlay").style.display = "block";
     $('#spinner').show();
+  }
+
+  function confirmAndShowSpinner(event, confirmMessage) {
+    
+    if (!confirm(confirmMessage)) {
+      // If the user clicks "Cancel", prevent the form submission
+      event.preventDefault();
+      return false;
+    }
+
+    show_spinner();
   }
 
   function hide_spinner(){
