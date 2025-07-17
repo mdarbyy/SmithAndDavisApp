@@ -1,0 +1,252 @@
+<% if @start_date.blank? || @end_date.blank? %>
+  <div class="d-flex justify-content-center align-items-center" style="min-height: 60vh;">
+    <div class="card p-4 shadow" style="max-width: 500px; width: 100%;">
+      <h4 class="mb-3 text-center">Select Date Range</h4>
+      <%= form_with url: dashboard_path, method: :get, local: true do |form| %>
+        <div class="mb-3">
+          <%= form.label :start_date, "Start Date", class: "form-label" %>
+          <%= form.date_field :start_date, class: "form-control", required: true, value: params[:start_date].presence || Date.current.strftime("%Y-%m-%d") %>
+        </div>
+        <div class="mb-3">
+          <%= form.label :end_date, "End Date", class: "form-label" %>
+          <%= form.date_field :end_date, class: "form-control", required: true, value: params[:end_date].presence || Date.current.strftime("%Y-%m-%d") %>
+        </div>
+        <div class="d-flex justify-content-end">
+          <%= form.submit "View Dashboard", class: "btn btn-main" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% else %>
+    
+	<div class="modal fade" id="salesRecordsModal" tabindex="-1" aria-labelledby="salesRecordsModalLabel" aria-hidden="true">
+		<div class="modal-dialog custom-modal">
+			<div class="modal-content" style="width: 750px;">
+				<div class="modal-header">
+					<h5 class="modal-title" id="salesRecordsModalLabel">Sales Records for <b><span id="salesPersonName"></span></b> (<span id="salesPersonRecordCount"></span>)</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<table class="table table-striped">
+						<thead>
+							<tr>
+								<th>Sell Date</th>
+								<th>Item Name</th>
+								<th>Item Price</th>
+							</tr>
+						</thead>
+						<tbody id="salesRecordsTableBody">
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-12 col-md-3">
+				<div class="card p-4 shadow-sm">
+					<h5 class="mb-3 text-center">Change Date Range</h5>
+					<%= form_with url: dashboard_path, method: :get, local: true do |form| %>
+						<div class="mb-3">
+							<%= form.label :start_date, "Start Date", class: "form-label" %>
+							<%= form.date_field :start_date, class: "form-control", value: params[:start_date], required: true %>
+						</div>
+						<div class="mb-3">
+							<%= form.label :end_date, "End Date", class: "form-label" %>
+							<%= form.date_field :end_date, class: "form-control", value: params[:end_date], required: true %>
+						</div>
+						<div class="d-flex justify-content-end">
+							<%= form.submit "Submit", class: "btn btn-main" %>
+						</div>
+					<% end %>
+				</div>
+			</div>
+
+			<div class="col-12 col-md-9">
+				<ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
+					<li class="nav-item" role="presentation">
+						<a class="nav-link active" id="total-sales-tab" data-bs-toggle="tab" href="#total-sales" role="tab" aria-controls="total-sales" aria-selected="true">
+							Total Sales
+						</a>
+					</li>
+				</ul>
+
+				<div class="card border-top-0 rounded-bottom">
+					<div class="card-body tab-content" id="dashboardTabsContent">
+						<div class="tab-pane fade show active" id="total-sales" role="tabpanel" aria-labelledby="total-sales-tab">
+							
+							<div class="row mb-3">
+								<div class="col d-flex flex-column align-items-center">
+									<select id="sales-person-filter" class="selectpicker" multiple data-actions-box="true" title="Sales People" data-selected-text-format="count" data-count-selected-text="{0} people selected" data-width="100%"></select>
+								</div>
+							</div>
+
+							<div class="row">
+								<div class="col">
+									<div id="sales-bar-chart" style="width: 100%; height: calc(100vh - 220px);"></div>
+								</div>
+							</div>
+							
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+<% end %>
+
+<% if @start_date.present? and @end_date.present? %>
+
+	<script>
+		$(document).ready(function() {
+			
+			console.log(`Width: ${window.innerWidth}px, Height: ${window.innerHeight}px`);
+			
+			const salesRecords = <%= raw @sales_records.to_json %>;
+			const salesPeople = <%= raw @sales_people.to_json %>;
+
+			console.log("Sales Records:", salesRecords);
+			console.log("Sales People:", salesPeople);
+
+			const salesPersonIdToName = {};
+			salesPeople.forEach(sp => {
+				const name = `${sp.first_name} ${sp.last_name}`.trim().replace(/\s+/g, ' ');
+				salesPersonIdToName[sp.id] = name;
+			});
+
+			console.log("SalesPersonIDToName: " + salesPersonIdToName);
+
+			const totalsByPerson = {};
+
+			salesRecords.forEach(record => {
+				const name = (salesPersonIdToName[record.sales_person_id]).trim().replace(/\s+/g, ' ');
+				const price = Number(record.item_price);
+
+				if (!totalsByPerson[name]) totalsByPerson[name] = 0;
+				totalsByPerson[name] += price;
+			});
+
+			const allSortedData = Object.entries(totalsByPerson).sort((a, b) => a[0].localeCompare(b[0]));
+			console.log(allSortedData);
+			
+			function populateSalesPersonSelect(allSortedData) {
+				const uniqueNames = [...new Set(allSortedData.map(([name]) => name))].sort();
+
+				let select = $('#sales-person-filter');
+				select.find('option').remove();
+
+				const optionsHtml = uniqueNames.map(name => 
+					new Option(name, name, true, true).outerHTML
+				).join('');
+
+				select.html(optionsHtml);
+				select.selectpicker('destroy');
+				select.selectpicker();
+			}
+
+			function renderChart() {
+				const selectedNames = $('#sales-person-filter').val();	
+
+				const filteredData = allSortedData.filter(([name, _]) => {
+    			return selectedNames.includes(name);
+  			});
+
+				const categories = filteredData.map(([name]) => name);
+				const data = filteredData.map(([_, total]) => total);
+
+				Highcharts.chart('sales-bar-chart', {
+					chart: {
+						type: 'column'
+					},
+					title: {
+						text: 'Total Sales by Sales Person'
+					},
+					xAxis: {
+						categories: categories,
+						title: { text: 'Sales Person' }
+					},
+					yAxis: {
+						min: 0,
+						title: { text: 'Total Sales ($)' }
+					},
+					tooltip: {
+						enabled: false
+					},
+					plotOptions: {
+						column: {
+							cursor: 'pointer',
+							point: {
+								events: {
+									click: function() {
+										showSalesRecordsForClickedPerson(this.category);
+									}
+								}
+							},
+							dataLabels: {
+								enabled: true,
+								formatter: function() {
+									return Highcharts.numberFormat(this.y, 0, '.', ',');
+								},
+								style: {
+									color: '#333',
+									fontSize: '16px'
+								}
+							}
+						}
+					},
+					series: [{
+						name: 'Total Sales',
+						data: data,
+						color: '#193856'
+					}]
+				});
+    	}
+
+			function showSalesRecordsForClickedPerson(clickedName) {
+				// Find the salesPersonId that matches the clicked name
+				const salesPersonId = Object.keys(salesPersonIdToName).find(
+					id => salesPersonIdToName[id] === clickedName
+				);
+
+				// Filter the sales_records for only this person
+				const filteredRecords = salesRecords.filter(
+					record => record.sales_person_id == salesPersonId
+				);
+
+				console.log(`Sales records for ${clickedName}:`, filteredRecords);
+				document.getElementById('salesPersonName').textContent = clickedName;
+				document.getElementById('salesPersonRecordCount').textContent = filteredRecords.length;
+
+				// Example: populate modal table
+				const tbody = document.querySelector('#salesRecordsTableBody');
+				tbody.innerHTML = '';
+
+				filteredRecords.forEach(record => {
+					const row = document.createElement('tr');
+					row.innerHTML = `
+						<td>${luxon.DateTime.fromISO(record.sell_date).toFormat('MM-dd-yyyy')}</td>
+						<td>${record.item_name}</td>
+						<td>$${record.item_price}</td>
+					`;
+					tbody.appendChild(row);
+				});
+
+				// Show your Bootstrap modal
+				const modal = new bootstrap.Modal(document.getElementById('salesRecordsModal'));
+				modal.show();
+			}
+
+			populateSalesPersonSelect(allSortedData);
+			renderChart();
+
+			$('#sales-person-filter').on('changed.bs.select', function () {
+  			renderChart();
+			});
+
+			
+		});
+	</script>
+
+<% end %>
