@@ -159,7 +159,7 @@
 						type: 'column'
 					},
 					title: {
-						text: 'Total Sales by Sales Person'
+						text: 'Total Sales from <%= Date.parse(@start_date).strftime("%m/%d/%Y") %> to <%= Date.parse(@start_date).strftime("%m/%d/%Y") %>'
 					},
 					xAxis: {
 						categories: categories,
@@ -212,7 +212,7 @@
 					record => record.sales_person_id == salesPersonId
 				);
 
-				filteredRecords.sort((a, b) => new Date(b.sell_date) - new Date(a.sell_date));
+				filteredRecords.sort((a, b) => new Date(a.sell_date) - new Date(b.sell_date));
 
 				console.log(`Sales records for ${clickedName}:`, filteredRecords);
 				document.getElementById('salesPersonName').textContent = clickedName;
@@ -226,7 +226,7 @@
 				filteredRecords.forEach(record => {
 					const row = document.createElement('tr');
 					row.innerHTML = `
-						<td>${luxon.DateTime.fromISO(record.sell_date).toFormat('MM-dd-yyyy')}</td>
+						<td>${luxon.DateTime.fromISO(record.sell_date).toFormat('MM/dd/yyyy')}</td>
 						<td>${record.item_name}</td>
 						<td>$${record.item_price}</td>
 					`;

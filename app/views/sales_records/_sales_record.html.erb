@@ -3,6 +3,6 @@
   <td><%= sales_record.item_price %></td>
   <% sales_person = SalesPerson.find(sales_record.sales_person_id) %>
   <td><%= sales_person.first_name + " " + sales_person.last_name %></td>
-  <td><%= sales_record.sell_date.strftime("%m-%d-%Y") %></td>
+  <td><%= sales_record.sell_date.strftime("%m/%d/%Y") %></td>
   <td><%= button_to 'Delete', sales_record_path(sales_record), method: :delete, class: 'btn btn-delete btn-right', onclick: "confirmAndShowSpinner(event, 'Are you sure you want to delete this Sales Record?')", style:"margin-top: 0;" %></td>
 </tr>
