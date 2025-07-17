@@ -6,6 +6,8 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
+    <%= favicon_link_tag 'favicon.ico' %>
+
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Handjet">
 
@@ -213,6 +215,10 @@
       .btn-right {
         margin-right: 5px; 
         margin-top: 10px;
+      }
+
+      .custom-modal {
+        max-height: 80vh;
       }
 
       .dashboard-row {
@@ -561,14 +567,24 @@
   }
 
   $('th').click(function() {
+    
+    if ($(this).closest('table').closest('.modal').length > 0) {
+      return;
+    }
+    
     var table = $(this).parents('table').eq(0);
     var rows = table.find('tbody tr').toArray();
+    
     var column = $(this).index();
     var asc = $(this).hasClass('asc');
 
     rows.sort(function(a, b) {
       var aVal = $(a).children('td').eq(column).text();
       var bVal = $(b).children('td').eq(column).text();
+
+      // Remove $ from currency values
+      if (aVal.startsWith('$')) aVal = aVal.replace('$', '');
+      if (bVal.startsWith('$')) bVal = bVal.replace('$', '');
 
       // Check if the values are percentages
       if (aVal.endsWith('%') && bVal.endsWith('%')) {

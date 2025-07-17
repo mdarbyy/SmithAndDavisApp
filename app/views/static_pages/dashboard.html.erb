@@ -26,18 +26,20 @@
 					<h5 class="modal-title" id="salesRecordsModalLabel">Sales Records for <b><span id="salesPersonName"></span></b> (<span id="salesPersonRecordCount"></span>)</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
-				<div class="modal-body">
-					<table class="table table-striped">
-						<thead>
-							<tr>
-								<th>Sell Date</th>
-								<th>Item Name</th>
-								<th>Item Price</th>
-							</tr>
-						</thead>
-						<tbody id="salesRecordsTableBody">
-						</tbody>
-					</table>
+				<div class="modal-body custom-modal">
+					<div id="content-scroll" style="max-height: 75vh;">
+						<table class="table content" id="content-table">
+							<thead>
+								<tr>
+									<th class="stick" scope="col">Sell Date</th>
+									<th class="stick" scope="col">Item Name</th>
+									<th class="stick" scope="col">Item Price</th>
+								</tr>
+							</thead>
+							<tbody id="totalSalesTableBody">
+							</tbody>
+						</table>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -187,7 +189,7 @@
 							dataLabels: {
 								enabled: true,
 								formatter: function() {
-									return Highcharts.numberFormat(this.y, 0, '.', ',');
+									return '$' + Highcharts.numberFormat(this.y, 0, '.', ',');
 								},
 								style: {
 									color: '#333',
@@ -210,18 +212,20 @@
 					id => salesPersonIdToName[id] === clickedName
 				);
 
-				// Filter the sales_records for only this person
 				const filteredRecords = salesRecords.filter(
 					record => record.sales_person_id == salesPersonId
 				);
+
+				filteredRecords.sort((a, b) => new Date(b.sell_date) - new Date(a.sell_date));
 
 				console.log(`Sales records for ${clickedName}:`, filteredRecords);
 				document.getElementById('salesPersonName').textContent = clickedName;
 				document.getElementById('salesPersonRecordCount').textContent = filteredRecords.length;
 
-				// Example: populate modal table
-				const tbody = document.querySelector('#salesRecordsTableBody');
+				const tbody = document.querySelector('#totalSalesTableBody');
 				tbody.innerHTML = '';
+
+				let total = 0;
 
 				filteredRecords.forEach(record => {
 					const row = document.createElement('tr');
@@ -231,9 +235,17 @@
 						<td>$${record.item_price}</td>
 					`;
 					tbody.appendChild(row);
+					total += parseFloat(record.item_price);
 				});
 
-				// Show your Bootstrap modal
+				const totalRow = document.createElement('tr');
+				totalRow.classList.add('total-row');
+				totalRow.innerHTML = `
+					<td colspan="2" style="text-align: right;"><strong>Total</strong></td>
+					<td><strong>$${total}</strong></td>
+				`;
+				tbody.appendChild(totalRow);
+
 				const modal = new bootstrap.Modal(document.getElementById('salesRecordsModal'));
 				modal.show();
 			}
