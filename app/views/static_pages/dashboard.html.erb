@@ -159,7 +159,12 @@
 						type: 'column'
 					},
 					title: {
-						text: 'Total Sales from <%= Date.parse(@start_date).strftime("%m/%d/%Y") %> to <%= Date.parse(@start_date).strftime("%m/%d/%Y") %>'
+						
+						<% if @start_date == @end_date %>
+							text: 'Total Sales for <%= Date.parse(@start_date).strftime("%m/%d/%Y") %>'
+						<% else %>
+							text: 'Total Sales from <%= Date.parse(@start_date).strftime("%m/%d/%Y") %> to <%= Date.parse(@start_date).strftime("%m/%d/%Y") %>'
+						<% end %>
 					},
 					xAxis: {
 						categories: categories,
