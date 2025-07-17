@@ -104,8 +104,6 @@
 	<script>
 		$(document).ready(function() {
 			
-			console.log(`Width: ${window.innerWidth}px, Height: ${window.innerHeight}px`);
-			
 			const salesRecords = <%= raw @sales_records.to_json %>;
 			const salesPeople = <%= raw @sales_people.to_json %>;
 
@@ -117,8 +115,6 @@
 				const name = `${sp.first_name} ${sp.last_name}`.trim().replace(/\s+/g, ' ');
 				salesPersonIdToName[sp.id] = name;
 			});
-
-			console.log("SalesPersonIDToName: " + salesPersonIdToName);
 
 			const totalsByPerson = {};
 
@@ -133,7 +129,7 @@
 			const allSortedData = Object.entries(totalsByPerson).sort((a, b) => a[0].localeCompare(b[0]));
 			console.log(allSortedData);
 			
-			function populateSalesPersonSelect(allSortedData) {
+			function populateTotalSalesSalesPersonSelect(allSortedData) {
 				const uniqueNames = [...new Set(allSortedData.map(([name]) => name))].sort();
 
 				let select = $('#sales-person-filter');
@@ -147,8 +143,8 @@
 				select.selectpicker('destroy');
 				select.selectpicker();
 			}
-
-			function renderChart() {
+			
+			function renderTotalSalesChart() {
 				const selectedNames = $('#sales-person-filter').val();	
 
 				const filteredData = allSortedData.filter(([name, _]) => {
@@ -182,7 +178,7 @@
 							point: {
 								events: {
 									click: function() {
-										showSalesRecordsForClickedPerson(this.category);
+										showTotalSalesRecordsForClickedPerson(this.category);
 									}
 								}
 							},
@@ -206,7 +202,7 @@
 				});
     	}
 
-			function showSalesRecordsForClickedPerson(clickedName) {
+			function showTotalSalesRecordsForClickedPerson(clickedName) {
 				// Find the salesPersonId that matches the clicked name
 				const salesPersonId = Object.keys(salesPersonIdToName).find(
 					id => salesPersonIdToName[id] === clickedName
@@ -250,14 +246,13 @@
 				modal.show();
 			}
 
-			populateSalesPersonSelect(allSortedData);
-			renderChart();
+			populateTotalSalesSalesPersonSelect(allSortedData);
+			renderTotalSalesChart();
 
 			$('#sales-person-filter').on('changed.bs.select', function () {
-  			renderChart();
+  			renderTotalSalesChart();
 			});
 
-			
 		});
 	</script>
 
