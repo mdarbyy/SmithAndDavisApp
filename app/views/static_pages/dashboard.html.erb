@@ -258,7 +258,7 @@
 						dailyTotalRow.classList.add('daily-total-row');
 						dailyTotalRow.innerHTML = `
 							<td colspan="2" style="text-align: right; font-weight: bold;">Daily Total</td>
-							<td><strong>$${dailyTotal}</strong></td>
+							<td><strong>$${dailyTotal.toLocaleString()}</strong></td>
 						`;
 						tbody.appendChild(dailyTotalRow);
 					}
@@ -268,7 +268,7 @@
 				const totalRow = document.createElement('tr');
 				totalRow.innerHTML = `
 					<td colspan="2" style="text-align: right;"><strong>Grand Total</strong></td>
-					<td><strong>$${overallTotal}</strong></td>
+					<td><strong>$${overallTotal.toLocaleString()}</strong></td>
 				`;
 				tbody.appendChild(totalRow);
 
