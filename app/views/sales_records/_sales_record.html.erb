@@ -1,6 +1,6 @@
 <tr>
   <td><%= link_to sales_record.item_name, edit_sales_record_path(sales_record), class: "nav-link" %></td>
-  <td><%= sales_record.item_price %></td>
+  <td><%= '$' + sales_record.item_price.to_s %></td>
   <% sales_person = SalesPerson.find(sales_record.sales_person_id) %>
   <td><%= sales_person.first_name + " " + sales_person.last_name %></td>
   <td><%= sales_record.sell_date.strftime("%m/%d/%Y") %></td>

@@ -163,7 +163,7 @@
 						<% if @start_date == @end_date %>
 							text: 'Total Sales for <%= Date.parse(@start_date).strftime("%m/%d/%Y") %>'
 						<% else %>
-							text: 'Total Sales from <%= Date.parse(@start_date).strftime("%m/%d/%Y") %> to <%= Date.parse(@start_date).strftime("%m/%d/%Y") %>'
+							text: 'Total Sales from <%= Date.parse(@start_date).strftime("%m/%d/%Y") %> to <%= Date.parse(@end_date).strftime("%m/%d/%Y") %>'
 						<% end %>
 					},
 					xAxis: {
@@ -208,16 +208,13 @@
     	}
 
 			function showTotalSalesRecordsForClickedPerson(clickedName) {
-				// Find the salesPersonId that matches the clicked name
 				const salesPersonId = Object.keys(salesPersonIdToName).find(
 					id => salesPersonIdToName[id] === clickedName
 				);
 
-				const filteredRecords = salesRecords.filter(
-					record => record.sales_person_id == salesPersonId
-				);
-
-				filteredRecords.sort((a, b) => new Date(a.sell_date) - new Date(b.sell_date));
+				const filteredRecords = salesRecords
+					.filter(record => record.sales_person_id == salesPersonId)
+					.sort((a, b) => new Date(a.sell_date) - new Date(b.sell_date));
 
 				console.log(`Sales records for ${clickedName}:`, filteredRecords);
 				document.getElementById('salesPersonName').textContent = clickedName;
@@ -226,24 +223,49 @@
 				const tbody = document.querySelector('#totalSalesTableBody');
 				tbody.innerHTML = '';
 
-				let total = 0;
+				let overallTotal = 0;
 
+				// Group records by date
+				const groupedByDate = {};
 				filteredRecords.forEach(record => {
-					const row = document.createElement('tr');
-					row.innerHTML = `
-						<td>${luxon.DateTime.fromISO(record.sell_date).toFormat('MM/dd/yyyy')}</td>
-						<td>${record.item_name}</td>
-						<td>$${record.item_price}</td>
-					`;
-					tbody.appendChild(row);
-					total += parseFloat(record.item_price);
+					const date = luxon.DateTime.fromISO(record.sell_date).toFormat('MM/dd/yyyy');
+					if (!groupedByDate[date]) groupedByDate[date] = [];
+					groupedByDate[date].push(record);
 				});
 
+				const uniqueDates = Object.keys(groupedByDate);
+
+				uniqueDates.forEach(date => {
+					let dailyTotal = 0;
+					groupedByDate[date].forEach(record => {
+						const row = document.createElement('tr');
+						row.innerHTML = `
+							<td>${date}</td>
+							<td>${record.item_name}</td>
+							<td>$${record.item_price}</td>
+						`;
+						tbody.appendChild(row);
+						dailyTotal += parseFloat(record.item_price);
+						overallTotal += parseFloat(record.item_price);
+					});
+
+					// Only show daily total if there’s more than one day of data
+					if (uniqueDates.length > 1) {
+						const dailyTotalRow = document.createElement('tr');
+						dailyTotalRow.classList.add('daily-total-row');
+						dailyTotalRow.innerHTML = `
+							<td colspan="2" style="text-align: right; font-weight: bold;">Daily Total</td>
+							<td><strong>$${dailyTotal}</strong></td>
+						`;
+						tbody.appendChild(dailyTotalRow);
+					}
+				});
+
+				// Overall total
 				const totalRow = document.createElement('tr');
-				totalRow.classList.add('total-row');
 				totalRow.innerHTML = `
-					<td colspan="2" style="text-align: right;"><strong>Total</strong></td>
-					<td><strong>$${total}</strong></td>
+					<td colspan="2" style="text-align: right;"><strong>Grand Total</strong></td>
+					<td><strong>$${overallTotal}</strong></td>
 				`;
 				tbody.appendChild(totalRow);
 

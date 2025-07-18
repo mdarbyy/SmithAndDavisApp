@@ -582,9 +582,9 @@
       var aVal = $(a).children('td').eq(column).text();
       var bVal = $(b).children('td').eq(column).text();
 
-      // Remove $ from currency values
-      if (aVal.startsWith('$')) aVal = aVal.replace('$', '');
-      if (bVal.startsWith('$')) bVal = bVal.replace('$', '');
+      // Clean currency: remove $, commas, trim spaces
+      aVal = aVal.replace(/[$,]/g, '').trim();
+      bVal = bVal.replace(/[$,]/g, '').trim();
 
       // Check if the values are percentages
       if (aVal.endsWith('%') && bVal.endsWith('%')) {
