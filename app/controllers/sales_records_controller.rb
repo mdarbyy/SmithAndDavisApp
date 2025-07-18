@@ -41,8 +41,6 @@ class SalesRecordsController < ApplicationController
 
   # PATCH/PUT /sales_records/1 or /sales_records/1.json
   def update
-    sales_record_parameters = sales_record_params
-  
     if @sales_record.update(sales_record_params)
       redirect_to sales_records_path, success: 'Sales Record was updated'
     else

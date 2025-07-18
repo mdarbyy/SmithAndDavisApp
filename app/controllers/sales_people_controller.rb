@@ -40,8 +40,6 @@ class SalesPeopleController < ApplicationController
 
   # PATCH/PUT /sales_people/1 or /sales_people/1.json
   def update
-    sales_person_parameters = sales_person_params
-  
     if @sales_person.update(sales_person_params)
       redirect_to sales_people_path, success: 'Sales Person was updated'
     else
