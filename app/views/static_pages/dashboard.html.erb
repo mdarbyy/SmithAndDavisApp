@@ -1,7 +1,7 @@
 <% if @start_date.blank? || @end_date.blank? %>
   <div class="d-flex justify-content-center align-items-center" style="min-height: 60vh;">
     <div class="card p-4 shadow" style="max-width: 500px; width: 100%;">
-      <h4 class="mb-3 text-center">Select Date Range</h4>
+      <h4 class="mb-3 text-center">Select a Date Range</h4>
       <%= form_with url: dashboard_path, method: :get, local: true do |form| %>
         <div class="mb-3">
           <%= form.label :start_date, "Start Date", class: "form-label" %>
@@ -12,7 +12,7 @@
           <%= form.date_field :end_date, class: "form-control", required: true, value: params[:end_date].presence || Date.current.strftime("%Y-%m-%d") %>
         </div>
         <div class="d-flex justify-content-end">
-          <%= form.submit "View Dashboard", class: "btn btn-main" %>
+          <%= form.submit "View Dashboard", class: "btn btn-main", onclick:"show_spinner()" %>
         </div>
       <% end %>
     </div>
@@ -49,7 +49,7 @@
 		<div class="row">
 			<div class="col-12 col-md-3">
 				<div class="card p-4 shadow-sm">
-					<h5 class="mb-3 text-center">Change Date Range</h5>
+					<h5 class="mb-3 text-center">Change the Date Range</h5>
 					<%= form_with url: dashboard_path, method: :get, local: true do |form| %>
 						<div class="mb-3">
 							<%= form.label :start_date, "Start Date", class: "form-label" %>
@@ -60,7 +60,7 @@
 							<%= form.date_field :end_date, class: "form-control", value: params[:end_date], required: true %>
 						</div>
 						<div class="d-flex justify-content-end">
-							<%= form.submit "Submit", class: "btn btn-main" %>
+							<%= form.submit "Submit", class: "btn btn-main", onclick:"show_spinner()" %>
 						</div>
 					<% end %>
 				</div>
