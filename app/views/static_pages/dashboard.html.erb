@@ -205,7 +205,9 @@
         name: data.name,
         records: data.records
       }));
-			groupedSalesArray.sort((a, b) => a.name.localeCompare(b.name));
+      
+			// Sort from most to least based on the number of records
+      groupedSalesArray.sort((a, b) => b.records.length - a.records.length);
 
 			console.log("Grouped Sales: ", groupedSalesArray);
 			
