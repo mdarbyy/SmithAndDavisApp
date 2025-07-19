@@ -41,7 +41,7 @@ class ItemsController < ApplicationController
   # PATCH/PUT /items/1 or /items/1.json
   def update
     if @item.update(item_params)
-      redirect_to sales_people_path, success: 'Item was updated'
+      redirect_to items_path, success: 'Item was updated'
     else
       flash.now[:danger] = @item.errors.full_messages.first
       render :edit, status: :unprocessable_entity

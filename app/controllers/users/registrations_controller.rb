@@ -1,4 +1,5 @@
 class Users::RegistrationsController < Devise::RegistrationsController
+  before_action :check_user_count, only: [:new, :create]
 
   def create
     user = User.find_by(email: sign_up_params[:email])
@@ -22,6 +23,14 @@ class Users::RegistrationsController < Devise::RegistrationsController
       set_flash_message! :success, :signed_up
       sign_up(resource_name, resource)
       respond_with resource, location: after_sign_up_path_for(resource)
+    end
+  end
+
+  private
+
+  def check_user_count
+    if User.exists?
+      redirect_to new_user_session_path, danger: "Contact a administrator to create an account"
     end
   end
 

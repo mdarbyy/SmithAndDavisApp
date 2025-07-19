@@ -201,10 +201,10 @@
 			});
 
 			const groupedSalesArray = Object.entries(groupedSales).map(([item_id, data]) => ({
-					item_id,
-					name: data.name,
-					records: data.records
-				}));
+        item_id,
+        name: data.name,
+        records: data.records
+      }));
 			groupedSalesArray.sort((a, b) => a.name.localeCompare(b.name));
 
 			console.log("Grouped Sales: ", groupedSalesArray);
@@ -263,9 +263,9 @@
 			function renderTotalSalesChart() {
 				const selectedNames = $('#sales-person-filter').val();	
 
-				const filteredData = allSortedData.filter(([name, _]) => {
-    			return selectedNames.includes(name);
-  			});
+				const filteredData = allSortedData.filter(([name]) =>
+          selectedNames.includes(name)
+        );
 
 				const nameToSalesPersonId = {};
 				Object.entries(salesPersonIdToName).forEach(([id, name]) => {
@@ -279,7 +279,7 @@
 				).length;
 
 				const categories = filteredData.map(([name]) => name);
-				const data = filteredData.map(([_, total]) => total);
+				const data = filteredData.map(([name, total]) => total);
 
 				Highcharts.chart('sales-bar-chart', {
 					chart: {
@@ -316,7 +316,7 @@
 							point: {
 								events: {
 									click: function() {
-										showTotalSalesRecordsForClickedPerson(this.category);
+										showTotalSalesForClickedPerson(this.category);
 									}
 								}
 							},
@@ -343,7 +343,7 @@
 				});
     	}
 
-			function showTotalSalesRecordsForClickedPerson(clickedName) {
+			function showTotalSalesForClickedPerson(clickedName) {
 				const salesPersonId = Object.keys(salesPersonIdToName).find(
 					id => salesPersonIdToName[id] === clickedName
 				);
@@ -395,11 +395,18 @@
 						const dailyTotalRow = document.createElement('tr');
 						dailyTotalRow.classList.add('daily-total-row');
 						dailyTotalRow.innerHTML = `
-							<td colspan="2" style="text-align: right; font-weight: bold;">Daily Total</td>
+							<td colspan="2" style="text-align: right; font-weight: bold;">Day Total</td>
 							<td><strong>$${dailyTotal.toLocaleString()}</strong></td>
 						`;
 						tbody.appendChild(dailyTotalRow);
 					}
+
+          //add a row for spacing
+          const spaceRow = document.createElement('tr');
+          spaceRow.innerHTML = `
+					<td colspan="3"></td>
+				  `;
+          tbody.appendChild(spaceRow);
 				});
 
 				// Overall total
