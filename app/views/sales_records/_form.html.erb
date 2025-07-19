@@ -3,7 +3,7 @@
   <div class="row g-3 mb-3 align-items-center">
     <div class="col-12">
       <label class="col-form-label"><strong>Sales Person</strong></label>
-      <select id="shared_sales_person" class="form-control">
+      <select id="shared_sales_person" class="form-control select2">
         <%= options_from_collection_for_select(SalesPerson.all.order(:first_name, :last_name), :id, ->(sp) { "#{sp.first_name} #{sp.last_name}" }) %>
       </select>
     </div>
@@ -22,7 +22,7 @@
       <div class="row g-3 align-items-center">
         <div class="col-8">
           <label class="col-form-label"><strong>Item</strong></label>
-          <select name="sales_records[__TIMESTAMP__][item_id]" class="form-control">
+          <select name="sales_records[__TIMESTAMP__][item_id]" class="form-control select2">
             <%= options_from_collection_for_select(Item.all.order(:name), :id, :name) %>
           </select>
         </div>

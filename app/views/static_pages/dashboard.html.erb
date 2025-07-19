@@ -274,9 +274,13 @@
 
 				const selectedIds = selectedNames.map(name => nameToSalesPersonId[name]);
 				// Count how many sales_records match those sales_person_ids
-				const matchingSalesCount = salesRecords.filter(record => 
+				const filteredSales = salesRecords.filter(record => 
 					selectedIds.includes(record.sales_person_id)
-				).length;
+				);
+
+        const totalSales = filteredSales.reduce((accumulator, sale) =>{
+          return accumulator + sale.item_price;
+        }, 0);
 
 				const categories = filteredData.map(([name]) => name);
 				const data = filteredData.map(([name, total]) => total);
@@ -293,7 +297,7 @@
 						<% end %>
 					},
 					subtitle: {
-						text: 'Sales: ' + matchingSalesCount,
+						text: `$${Highcharts.numberFormat(totalSales, 0, '.', ',')} (${filteredSales.length})`,
 						style: {
 							fontSize: '18px', 
 							color: '#333'
