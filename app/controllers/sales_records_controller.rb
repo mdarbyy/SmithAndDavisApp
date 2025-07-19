@@ -62,7 +62,7 @@ class SalesRecordsController < ApplicationController
       SalesRecord.create!(
         sales_person_id: record[:sales_person_id].to_i,
         sell_date: record[:sell_date],
-        item_name: record[:item_name],
+        item_id: record[:item_id].to_i,
         item_price: record[:item_price]
       )
     end

@@ -7,7 +7,6 @@
     SalesPerson.all.order(:first_name, :last_name).map { |sp| ["#{sp.first_name} #{sp.last_name}", sp.id] },
     {},
     { class: "form-control" } %>
-
     </div>
   </div>
 	
@@ -20,14 +19,17 @@
 
   <div class="row g-3 mb-3 align-items-center">
     <div class="col-12">
-      <label class="col-form-label"><strong>Item Name</strong></label>
-      <%= form.text_field :item_name, class: 'form-control' %>
+      <label class="col-form-label"><strong>Item</strong></label>
+      <%= form.select :item_id,
+      Item.all.order(:name).map { |item| [item.name, item.id] },
+      {},
+      { class: 'form-control' } %>
     </div>
   </div>
 
 	<div class="row g-3 mb-3 align-items-center">
     <div class="col-12">
-      <label class="col-form-label"><strong>Item Price</strong></label>
+      <label class="col-form-label"><strong>Price</strong></label>
       <%= form.number_field :item_price, class: 'form-control' %>
     </div>
   </div>

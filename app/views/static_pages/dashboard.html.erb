@@ -106,9 +106,11 @@
 			
 			const salesRecords = <%= raw @sales_records.to_json %>;
 			const salesPeople = <%= raw @sales_people.to_json %>;
+			const Items = <%= raw @items.to_json %>;
 
 			console.log("Sales Records:", salesRecords);
 			console.log("Sales People:", salesPeople);
+			console.log("Items:", Items);
 
 			const salesPersonIdToName = {};
 			salesPeople.forEach(sp => {
@@ -159,7 +161,6 @@
 						type: 'column'
 					},
 					title: {
-						
 						<% if @start_date == @end_date %>
 							text: 'Total Sales for <%= Date.parse(@start_date).strftime("%m/%d/%Y") %>'
 						<% else %>
@@ -241,10 +242,15 @@
 				uniqueDates.forEach(date => {
 					let dailyTotal = 0;
 					groupedByDate[date].forEach(record => {
+						
+						const itemRecord = Items.find(
+							item => item.id === record.item_id
+						);
+
 						const row = document.createElement('tr');
 						row.innerHTML = `
 							<td>${date}</td>
-							<td>${record.item_name}</td>
+							<td>${itemRecord.name}</td>
 							<td>$${record.item_price}</td>
 						`;
 						tbody.appendChild(row);

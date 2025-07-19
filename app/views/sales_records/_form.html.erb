@@ -20,16 +20,18 @@
     <div class="wrapper mb-3">
       <hr class="separator" />
       <div class="row g-3 align-items-center">
-        <div class="col-5">
-          <label class="col-form-label"><strong>Item Name</strong></label>
-          <input type="text" name="sales_records[__TIMESTAMP__][item_name]" class="form-control" />
+        <div class="col-8">
+          <label class="col-form-label"><strong>Item</strong></label>
+          <select name="sales_records[__TIMESTAMP__][item_id]" class="form-control">
+            <%= options_from_collection_for_select(Item.all.order(:name), :id, :name) %>
+          </select>
         </div>
-        <div class="col-5">
-          <label class="col-form-label"><strong>Item Price</strong></label>
+        <div class="col-3">
+          <label class="col-form-label"><strong>Price</strong></label>
           <input type="number" name="sales_records[__TIMESTAMP__][item_price]" class="form-control" />
         </div>
         <div class="col-1">
-          <button type="button" class="btn btn-delete remove-item-btn" style="margin-top: 35px;">X</button>
+          <button type="button" class="btn btn-delete remove-item-btn" style="float: right; margin-top: 35px;">X</button>
         </div>
       </div>
 
@@ -90,7 +92,7 @@
     });
 
     itemList.addEventListener("input", function (e) {
-      if (e.target.matches("input[name*='[item_name]'], input[name*='[item_price]']")) {
+      if (e.target.matches("select[name*='[item_id]'], input[name*='[item_price]']")) {
         updateSubmitButtonVisibility();
       }
     });
@@ -117,18 +119,23 @@
 
     function updateSubmitButtonVisibility() {
       const itemWrappers = document.querySelectorAll("#item-list .wrapper");
-      let hasValidItem = false;
+      let hasValidItems = false;
 
       itemWrappers.forEach(wrapper => {
-        const name = wrapper.querySelector("input[name*='[item_name]']").value.trim();
-        const price = wrapper.querySelector("input[name*='[item_price]']").value.trim();
+        const itemSelect = wrapper.querySelector("select[name*='[item_id]']");
+        const priceInput = wrapper.querySelector("input[name*='[item_price]']");
 
-        if (name !== "" && price !== "") {
-          hasValidItem = true;
+        const itemValue = itemSelect?.value;
+        const priceValue = priceInput?.value?.trim();
+
+        if (itemValue && priceValue !== "") {
+          hasValidItems = true;
+        } else {
+          hasValidItems = false;
         }
       });
 
-      submitBtnRow.style.display = hasValidItem ? "flex" : "none";
+      submitBtnRow.style.display = hasValidItems ? "flex" : "none";
     }
 
     // Inject shared values on submit
