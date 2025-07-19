@@ -17,10 +17,13 @@ class Users::RegistrationsController < Devise::RegistrationsController
     elsif sign_up_params[:password_confirmation].blank?
       flash[:danger] = "You must confirm your password to create an account"
       redirect_to new_user_registration_path
+    elsif sign_up_params[:first_name].blank? or sign_up_params[:last_name].blank?
+      flash[:danger] = "You must fill out your name to create an account"
+      redirect_to new_user_registration_path
     else
       build_resource(sign_up_params)
       resource.save
-      set_flash_message! :success, :signed_up
+      flash[:success] = "Welcome, #{sign_up_params[:first_name]}"
       sign_up(resource_name, resource)
       respond_with resource, location: after_sign_up_path_for(resource)
     end
@@ -32,6 +35,10 @@ class Users::RegistrationsController < Devise::RegistrationsController
     if User.exists?
       redirect_to new_user_session_path, danger: "Contact a administrator to create an account"
     end
+  end
+
+  def sign_up_params
+    params.require(:user).permit(:email, :password, :password_confirmation, :first_name, :last_name)
   end
 
 end
