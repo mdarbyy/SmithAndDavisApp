@@ -219,7 +219,12 @@
       }
 
       .custom-modal {
-        max-height: 80vh;
+        max-height: 95vh;
+      }
+
+      .dashboard-content {
+        height: calc(100vh - 210px);
+        width: 100%;
       }
 
       .dashboard-row {
@@ -291,13 +296,6 @@
         display: none;
       }
 
-      @media (max-width: 767.98px) {
-        .custom-modal {
-          margin-left: 250px !important;
-          margin-right: auto !important;
-        }
-      }
-
       .nav-link, .nav-link:visited {
         color: #193856;
       }
@@ -306,7 +304,12 @@
         color: #052748;
       }
 
-      .scrollable-form, #content-scroll {
+      /* goes with .custom-modal */
+      .scrollable-table {
+        max-height: 90vh;
+      }
+
+      .scrollable-form, .scrollable-table, #content-scroll {
         overflow-y: auto;
         scrollbar-width: none;
       }
@@ -333,6 +336,23 @@
         display: flex;
         height: 100vh;
       }
+
+      @media (max-width: 767.98px) {
+        .custom-modal {
+          margin-left: 250px !important;
+          margin-right: auto !important;
+        }
+      }
+
+      @media(max-height: 594px){
+        .custom-modal{
+          max-height: 80vh;
+        }
+        .scrollable-table {
+          max-height: 75vh;
+        }
+      }
+
     </style>
   </head>
 

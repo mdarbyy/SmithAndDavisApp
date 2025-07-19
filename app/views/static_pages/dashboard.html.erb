@@ -19,15 +19,15 @@
   </div>
 <% else %>
     
-	<div class="modal fade" id="salesRecordsModal" tabindex="-1" aria-labelledby="salesRecordsModalLabel" aria-hidden="true">
+	<div class="modal fade" id="totalSalesModal" tabindex="-1" aria-labelledby="totalSalesModalLabel" aria-hidden="true">
 		<div class="modal-dialog custom-modal">
 			<div class="modal-content" style="width: 750px;">
 				<div class="modal-header">
-					<h5 class="modal-title" id="salesRecordsModalLabel">Sales Records for <b><span id="salesPersonName"></span></b> (<span id="salesPersonRecordCount"></span>)</h5>
+					<h5 class="modal-title" id="totalSalesModalLabel">Sales Records for <b><span id="salesPersonName"></span></b> (<span id="salesPersonRecordCount"></span>)</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
 				<div class="modal-body custom-modal">
-					<div id="content-scroll" style="max-height: 75vh;">
+					<div class="scrollable-table">
 						<table class="table content" id="content-table">
 							<thead>
 								<tr>
@@ -37,6 +37,32 @@
 								</tr>
 							</thead>
 							<tbody id="totalSalesTableBody">
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="salesBreakdownModal" tabindex="-1" aria-labelledby="salesBreakdownModalLabel" aria-hidden="true">
+		<div class="modal-dialog custom-modal">
+			<div class="modal-content" style="width: 750px;">
+				<div class="modal-header">
+					<h5 class="modal-title" id="salesBreakdownModalLabel"><b><span id="itemName"></b></span> (<span id="itemCount"></span>)</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body custom-modal">
+					<div class="scrollable-table">
+						<table class="table content" id="content-table">
+							<thead>
+								<tr>
+									<th class="stick" scope="col">Sales Person</th>
+									<th class="stick" scope="col">Sell Date</th>
+									<th class="stick" scope="col">Price</th>
+								</tr>
+							</thead>
+							<tbody id="salesBreakdownModalTableBody">
 							</tbody>
 						</table>
 					</div>
@@ -73,6 +99,11 @@
 							Total Sales
 						</a>
 					</li>
+					<li class="nav-item" role="presentation">
+						<a class="nav-link" id="sales-breakdown-tab" data-bs-toggle="tab" href="#sales-breakdown" role="tab" aria-controls="sales-breakdown" aria-selected="true">
+							Sales Breakdown
+						</a>
+					</li>
 				</ul>
 
 				<div class="card border-top-0 rounded-bottom">
@@ -87,10 +118,35 @@
 
 							<div class="row">
 								<div class="col">
-									<div id="sales-bar-chart" style="width: 100%; height: calc(100vh - 210px);"></div>
+									<div id="sales-bar-chart" class="dashboard-content"></div>
 								</div>
 							</div>
 							
+						</div>
+						<div class="tab-pane fade show" id="sales-breakdown" role="tabpanel" aria-labelledby="sales-breakdown-tab">
+							
+							<div class="row mb-3">
+								<div class="col d-flex flex-column align-items-center">
+									<select id="item-filter" class="selectpicker btn-secondary" multiple data-actions-box="true" title="Items" data-selected-text-format="count" data-count-selected-text="{0} items selected" data-width="100%"></select>
+								</div>
+							</div>
+
+							<div class="row">
+								<div class="col">
+									<div class="scrollable-table dashboard-content">
+										<table class="table content">
+											<thead>
+												<tr>
+													<th class="stick" scope="col">Item</th>
+													<th class="stick" scope="col">Amount Sold</th>
+												</tr>
+											</thead>
+											<tbody id="salesBreakdownTableBody">
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -100,10 +156,8 @@
 <% end %>
 
 <% if @start_date.present? and @end_date.present? %>
-
 	<script>
 		$(document).ready(function() {
-			
 			const salesRecords = <%= raw @sales_records.to_json %>;
 			const salesPeople = <%= raw @sales_people.to_json %>;
 			const Items = <%= raw @items.to_json %>;
@@ -119,7 +173,6 @@
 			});
 
 			const totalsByPerson = {};
-
 			salesRecords.forEach(record => {
 				const name = (salesPersonIdToName[record.sales_person_id]).trim().replace(/\s+/g, ' ');
 				const price = Number(record.item_price);
@@ -130,8 +183,46 @@
 
 			const allSortedData = Object.entries(totalsByPerson).sort((a, b) => a[0].localeCompare(b[0]));
 			console.log(allSortedData);
+
+			const itemIdToName = {};
+			Items.forEach(item => {
+				itemIdToName[item.id] = item.name;
+			});
+
+			const groupedSales = {};
+			salesRecords.forEach(record => {
+				if (!groupedSales[record.item_id]) {
+					groupedSales[record.item_id] = {
+						name: itemIdToName[record.item_id],
+						records: []
+					};
+				}
+				groupedSales[record.item_id].records.push(record);
+			});
+
+			const groupedSalesArray = Object.entries(groupedSales).map(([item_id, data]) => ({
+					item_id,
+					name: data.name,
+					records: data.records
+				}));
+			groupedSalesArray.sort((a, b) => a.name.localeCompare(b.name));
+
+			console.log("Grouped Sales: ", groupedSalesArray);
 			
-			function populateTotalSalesSalesPersonSelect(allSortedData) {
+			function populateSalesBreakdownItemSelect(){
+				const select = $('#item-filter');
+				select.find('option').remove();
+
+				const optionsHtml = groupedSalesArray.map(item =>
+					new Option(item.name, item.item_id, true, true).outerHTML
+				).join('');
+
+				select.html(optionsHtml);
+				select.selectpicker('destroy');
+				select.selectpicker();
+			}
+			
+			function populateTotalSalesSalesPersonSelect() {
 				const uniqueNames = [...new Set(allSortedData.map(([name]) => name))].sort();
 
 				let select = $('#sales-person-filter');
@@ -145,6 +236,29 @@
 				select.selectpicker('destroy');
 				select.selectpicker();
 			}
+
+			function renderSalesBreakdownTable(){
+				const selectedItemIds = $('#item-filter').val();
+				const tableBody = $('#salesBreakdownTableBody');
+  			tableBody.empty();
+				if (!selectedItemIds || selectedItemIds.length === 0) return;
+
+				// Filter to only selected items
+				const filteredItems = groupedSalesArray.filter(item =>
+					selectedItemIds.includes(item.item_id)
+				);
+
+				filteredItems.forEach(item => {
+					const rowHtml = `
+						<tr>
+							<td>${item.name}</td>
+							<td><a href="#" class="nav-link" data-item-id="${item.item_id}">${item.records.length}</a></td>
+						</tr>
+					`;
+					tableBody.append(rowHtml);
+				});
+
+			}
 			
 			function renderTotalSalesChart() {
 				const selectedNames = $('#sales-person-filter').val();	
@@ -152,6 +266,17 @@
 				const filteredData = allSortedData.filter(([name, _]) => {
     			return selectedNames.includes(name);
   			});
+
+				const nameToSalesPersonId = {};
+				Object.entries(salesPersonIdToName).forEach(([id, name]) => {
+					nameToSalesPersonId[name] = parseInt(id);
+				});
+
+				const selectedIds = selectedNames.map(name => nameToSalesPersonId[name]);
+				// Count how many sales_records match those sales_person_ids
+				const matchingSalesCount = salesRecords.filter(record => 
+					selectedIds.includes(record.sales_person_id)
+				).length;
 
 				const categories = filteredData.map(([name]) => name);
 				const data = filteredData.map(([_, total]) => total);
@@ -166,6 +291,13 @@
 						<% else %>
 							text: 'Total Sales from <%= Date.parse(@start_date).strftime("%m/%d/%Y") %> to <%= Date.parse(@end_date).strftime("%m/%d/%Y") %>'
 						<% end %>
+					},
+					subtitle: {
+						text: 'Sales: ' + matchingSalesCount,
+						style: {
+							fontSize: '18px', 
+							color: '#333'
+						}
 					},
 					xAxis: {
 						categories: categories,
@@ -278,18 +410,60 @@
 				`;
 				tbody.appendChild(totalRow);
 
-				const modal = new bootstrap.Modal(document.getElementById('salesRecordsModal'));
+				const modal = new bootstrap.Modal(document.getElementById('totalSalesModal'));
 				modal.show();
 			}
 
-			populateTotalSalesSalesPersonSelect(allSortedData);
+			populateTotalSalesSalesPersonSelect();
 			renderTotalSalesChart();
+			populateSalesBreakdownItemSelect();
+			renderSalesBreakdownTable();
+
+			$('#item-filter').on('changed.bs.select', function () {
+				renderSalesBreakdownTable();
+			});
 
 			$('#sales-person-filter').on('changed.bs.select', function () {
   			renderTotalSalesChart();
 			});
 
+			$(document).on('click', '.nav-link', function (e) {
+				e.preventDefault();
+
+				const itemId = $(this).data('item-id');
+				const itemData = groupedSales[itemId];
+
+				if (!itemData) return;
+
+				const itemName = itemData.name;
+				const records = itemData.records;
+
+				// Set modal title values
+				$('#itemName').text(itemName);
+				$('#itemCount').text(records.length);
+
+				// Build table rows
+				const rowsHtml = records.map(record => {
+					const salesPersonName = salesPersonIdToName[record.sales_person_id];
+					const sellDate = luxon.DateTime.fromISO(record.sell_date).toFormat('MM/dd/yyyy');
+					const itemPrice = `$${parseFloat(record.item_price)}`;
+
+					return `
+						<tr>
+							<td>${salesPersonName}</td>
+							<td>${sellDate}</td>
+							<td>${itemPrice}</td>
+						</tr>
+					`;
+				}).join('');
+
+				// Inject the rows into the modal table
+				$('#salesBreakdownModalTableBody').html(rowsHtml);
+
+				// Show the modal (jQuery-based Bootstrap call)
+				$('#salesBreakdownModal').modal('show');
+			});
+
 		});
 	</script>
-
 <% end %>
