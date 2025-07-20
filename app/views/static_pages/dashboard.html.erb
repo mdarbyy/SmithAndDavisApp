@@ -1,6 +1,6 @@
 <% if @start_date.blank? || @end_date.blank? %>
   <div class="d-flex justify-content-center align-items-center" style="min-height: 60vh;">
-    <div class="card p-4 shadow" style="max-width: 500px; width: 100%;">
+    <div class="card p-4 dashboard-card" style="max-width: 500px; width: 100%;">
       <h4 class="mb-3 text-center">Select a Date Range</h4>
       <%= form_with url: dashboard_path, method: :get, local: true do |form| %>
         <div class="mb-3">
@@ -84,7 +84,7 @@
 	<div class="container-fluid">
 		<div class="row">
 			<div class="col-12 col-md-3">
-				<div class="card p-4 shadow">
+				<div class="card p-4 dashboard-card">
 					<h5 class="mb-3 text-center">Change the Date Range</h5>
 					<%= form_with url: dashboard_path, method: :get, local: true do |form| %>
 						<div class="mb-3">
@@ -114,19 +114,19 @@
 
 			<div class="col-12 col-md-9">
 				<ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
-					<li class="nav-item shadow" role="presentation">
+					<li class="nav-item dashboard-card" role="presentation">
 						<a class="nav-link active" id="total-sales-tab" data-bs-toggle="tab" href="#total-sales" role="tab" aria-controls="total-sales" aria-selected="true">
 							Total Sales
 						</a>
 					</li>
-					<li class="nav-item shadow" role="presentation">
+					<li class="nav-item dashboard-card" role="presentation">
 						<a class="nav-link" id="sales-breakdown-tab" data-bs-toggle="tab" href="#sales-breakdown" role="tab" aria-controls="sales-breakdown" aria-selected="true">
 							Sales Breakdown
 						</a>
 					</li>
 				</ul>
 
-				<div class="card border-top-0 rounded-bottom shadow">
+				<div class="card border-top-0 rounded-bottom dashboard-card">
 					<div class="card-body tab-content" id="dashboardTabsContent">
 						<div class="tab-pane fade show active" id="total-sales" role="tabpanel" aria-labelledby="total-sales-tab">
 							
@@ -281,7 +281,7 @@
 					const rowHtml = `
 						<tr>
 							<td>${item.name}</td>
-							<td><a href="#" class="nav-link" data-item-id="${item.item_id}">${item.records.length}</a></td>
+							<td><a href="#" class="nav-link clickable-item" data-item-id="${item.item_id}">${item.records.length}</a></td>
 						</tr>
 					`;
 					tableBody.append(rowHtml);
@@ -467,7 +467,7 @@
   			renderTotalSalesChart();
 			});
 
-			$(document).on('click', '.nav-link', function (e) {
+			$(document).on('click', '.clickable-item', function (e) {
 				e.preventDefault();
 
 				const itemId = $(this).data('item-id');
