@@ -342,7 +342,15 @@
 					},
 					xAxis: {
 						categories: categories,
-						title: { text: 'Sales Person' }
+						title: { text: 'Sales Person' },
+            labels: {
+              style: {
+                width: '80px',
+                textOverflow: 'ellipsis',
+                overflow: 'hidden',
+                whiteSpace: 'nowrap'
+              }
+            }
 					},
 					yAxis: {
 						min: 0,
