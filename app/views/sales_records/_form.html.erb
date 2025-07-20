@@ -12,7 +12,12 @@
   <div class="row g-3 mb-3 align-items-center">
     <div class="col-12">
       <label class="col-form-label"><strong>Sell Date</strong></label>
-      <input type="date" id="shared_sell_date" class="form-control" value="<%= Date.today.strftime('%Y-%m-%d') %>" />
+      <div class="input-group">
+        <input type="text" id="shared_sell_date" class="form-control datepicker" value="<%= Date.today.strftime('%m/%d/%Y') %>" />
+        <span class="input-group-text datepicker-icon">
+          <i class="bi bi-calendar-date"></i>
+        </span>
+      </div>
     </div>
   </div>
 

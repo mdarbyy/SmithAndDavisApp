@@ -5,11 +5,21 @@
       <%= form_with url: dashboard_path, method: :get, local: true do |form| %>
         <div class="mb-3">
           <%= form.label :start_date, "Start Date", class: "form-label" %>
-          <%= form.date_field :start_date, class: "form-control", required: true, value: params[:start_date].presence || Date.current.strftime("%Y-%m-%d") %>
+          <div class="input-group">
+            <%= form.text_field :start_date, class: "form-control datepicker", required: true, value: (params[:start_date].presence || Date.current.strftime("%m/%d/%Y")) %>
+            <span class="input-group-text datepicker-icon">
+              <i class="bi bi-calendar-date"></i>
+            </span>
+          </div>
         </div>
         <div class="mb-3">
           <%= form.label :end_date, "End Date", class: "form-label" %>
-          <%= form.date_field :end_date, class: "form-control", required: true, value: params[:end_date].presence || Date.current.strftime("%Y-%m-%d") %>
+          <div class="input-group">
+            <%= form.text_field :end_date, class: "form-control datepicker", required: true, value: (params[:end_date].presence || Date.current.strftime("%m/%d/%Y")) %>
+            <span class="input-group-text datepicker-icon">
+              <i class="bi bi-calendar-date"></i>
+            </span>
+          </div>
         </div>
         <div class="d-flex justify-content-end">
           <%= form.submit "View Dashboard", class: "btn btn-main", onclick:"show_spinner()" %>
@@ -79,11 +89,21 @@
 					<%= form_with url: dashboard_path, method: :get, local: true do |form| %>
 						<div class="mb-3">
 							<%= form.label :start_date, "Start Date", class: "form-label" %>
-							<%= form.date_field :start_date, class: "form-control", value: params[:start_date], required: true %>
+							<div class="input-group">
+                <%= form.text_field :start_date, class: "form-control datepicker", required: true, value: (params[:start_date].presence || Date.current.strftime("%m/%d/%Y")) %>
+                <span class="input-group-text datepicker-icon">
+                  <i class="bi bi-calendar-date"></i>
+                </span>
+              </div>
 						</div>
 						<div class="mb-3">
 							<%= form.label :end_date, "End Date", class: "form-label" %>
-							<%= form.date_field :end_date, class: "form-control", value: params[:end_date], required: true %>
+							<div class="input-group">
+                <%= form.text_field :end_date, class: "form-control datepicker", required: true, value: (params[:end_date].presence || Date.current.strftime("%m/%d/%Y")) %>
+                <span class="input-group-text datepicker-icon">
+                  <i class="bi bi-calendar-date"></i>
+                </span>
+              </div>
 						</div>
 						<div class="d-flex justify-content-end">
 							<%= form.submit "Submit", class: "btn btn-main", onclick:"show_spinner()" %>
@@ -300,9 +320,9 @@
 					},
 					title: {
 						<% if @start_date == @end_date %>
-							text: 'Total Sales for <%= Date.parse(@start_date).strftime("%m/%d/%Y") %>'
+							text: 'Total Sales for <%= @start_date.strftime("%m/%d/%Y") %>'
 						<% else %>
-							text: 'Total Sales from <%= Date.parse(@start_date).strftime("%m/%d/%Y") %> to <%= Date.parse(@end_date).strftime("%m/%d/%Y") %>'
+							text: 'Total Sales from <%= @start_date.strftime("%m/%d/%Y") %> to <%= @end_date.strftime("%m/%d/%Y") %>'
 						<% end %>
 					},
 					subtitle: {

@@ -41,6 +41,11 @@ class SalesRecordsController < ApplicationController
 
   # PATCH/PUT /sales_records/1 or /sales_records/1.json
   def update
+    
+    if params[:sales_record][:sell_date].present?
+      params[:sales_record][:sell_date] = Date.strptime(params[:sales_record][:sell_date], '%m/%d/%Y')
+    end
+    
     if @sales_record.update(sales_record_params)
       redirect_to sales_records_path, success: 'Sales Record was updated'
     else
@@ -61,7 +66,7 @@ class SalesRecordsController < ApplicationController
     records.each do |record|
       SalesRecord.create!(
         sales_person_id: record[:sales_person_id].to_i,
-        sell_date: record[:sell_date],
+        sell_date: Date.strptime(record[:sell_date], '%m/%d/%Y'),
         item_id: record[:item_id].to_i,
         item_price: record[:item_price]
       )
