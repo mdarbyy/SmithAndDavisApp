@@ -312,7 +312,14 @@
         }, 0);
 
 				const categories = filteredData.map(([name]) => name);
-				const data = filteredData.map(([name, total]) => total);
+				const data = filteredData.map(([name, total]) => {
+          const id = nameToSalesPersonId[name];
+          const count = salesRecords.filter(record => record.sales_person_id === id).length;
+          return {
+            y: total,
+            custom: { count: count }
+          };
+        });
 
 				Highcharts.chart('sales-bar-chart', {
 					chart: {
@@ -354,15 +361,21 @@
 								}
 							},
 							dataLabels: {
-								enabled: true,
-								formatter: function() {
-									return '$' + Highcharts.numberFormat(this.y, 0, '.', ',');
-								},
-								style: {
-									color: '#333',
-									fontSize: '16px'
-								}
-							}
+                enabled: true,
+                useHTML: true,
+                formatter: function() {
+                  const sales = '$' + Highcharts.numberFormat(this.y, 0, '.', ',');
+                  const count = this.point.custom?.count || 0;
+                  return `<div style="text-align: center;">
+                    <div>${sales}</div>
+                    <div style="font-size: 12px; color: #777;">${count} sale${count === 1 ? '' : 's'}</div>
+                  </div>`;
+                },
+                style: {
+                  color: '#333',
+                  fontSize: '14px'
+                }
+              }
 						}
 					},
 					series: [{
