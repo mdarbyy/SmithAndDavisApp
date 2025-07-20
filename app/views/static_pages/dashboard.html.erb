@@ -38,7 +38,7 @@
 				</div>
 				<div class="modal-body custom-modal">
 					<div class="scrollable-table">
-						<table class="table content" id="content-table">
+						<table class="table content" id="totalSalesModalTable">
 							<thead>
 								<tr>
 									<th class="stick" scope="col">Sell Date</th>
@@ -46,7 +46,7 @@
 									<th class="stick" scope="col">Price</th>
 								</tr>
 							</thead>
-							<tbody id="totalSalesTableBody">
+							<tbody id="totalSalesModalTableBody">
 							</tbody>
 						</table>
 					</div>
@@ -64,7 +64,7 @@
 				</div>
 				<div class="modal-body custom-modal">
 					<div class="scrollable-table">
-						<table class="table content" id="content-table">
+						<table class="table content" id="salesBreakdownModalTable">
 							<thead>
 								<tr>
 									<th class="stick" scope="col">Sales Person</th>
@@ -154,7 +154,7 @@
 							<div class="row">
 								<div class="col">
 									<div class="scrollable-table dashboard-content">
-										<table class="table content">
+										<table class="table content" id="salesBreakdownTable">
 											<thead>
 												<tr>
 													<th class="stick" scope="col">Item</th>
@@ -389,7 +389,7 @@
 				document.getElementById('salesPersonName').textContent = clickedName;
 				document.getElementById('salesPersonRecordCount').textContent = filteredRecords.length;
 
-				const tbody = document.querySelector('#totalSalesTableBody');
+				const tbody = document.querySelector('#totalSalesModalTableBody');
 				tbody.innerHTML = '';
 
 				let overallTotal = 0;

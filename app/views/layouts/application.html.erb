@@ -674,7 +674,7 @@
 
   $('th').click(function() {
     
-    if ($(this).closest('table').closest('.modal').length > 0) {
+    if ($(this).closest('table').attr('id') == "totalSalesModalTable") {
       return;
     }
     
