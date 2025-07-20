@@ -323,7 +323,8 @@
 
 				Highcharts.chart('sales-bar-chart', {
 					chart: {
-						type: 'column'
+						type: 'column',
+            marginTop: 80
 					},
 					title: {
 						<% if @start_date == @end_date %>
@@ -335,7 +336,7 @@
 					subtitle: {
 						text: `$${Highcharts.numberFormat(totalSales, 0, '.', ',')} (${filteredSales.length})`,
 						style: {
-							fontSize: '18px', 
+							fontSize: '16px', 
 							color: '#333'
 						}
 					},
@@ -362,6 +363,10 @@
 							},
 							dataLabels: {
                 enabled: true,
+                inside: false,
+                crop: false,
+                overflow: 'none',
+                y: -4,
                 useHTML: true,
                 formatter: function() {
                   const sales = '$' + Highcharts.numberFormat(this.y, 0, '.', ',');
