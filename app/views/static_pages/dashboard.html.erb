@@ -74,7 +74,7 @@
 	<div class="container-fluid">
 		<div class="row">
 			<div class="col-12 col-md-3">
-				<div class="card p-4 shadow-sm">
+				<div class="card p-4 shadow">
 					<h5 class="mb-3 text-center">Change the Date Range</h5>
 					<%= form_with url: dashboard_path, method: :get, local: true do |form| %>
 						<div class="mb-3">
@@ -106,7 +106,7 @@
 					</li>
 				</ul>
 
-				<div class="card border-top-0 rounded-bottom">
+				<div class="card border-top-0 rounded-bottom shadow">
 					<div class="card-body tab-content" id="dashboardTabsContent">
 						<div class="tab-pane fade show active" id="total-sales" role="tabpanel" aria-labelledby="total-sales-tab">
 							
@@ -206,8 +206,15 @@
         records: data.records
       }));
       
-			// Sort from most to least based on the number of records
-      groupedSalesArray.sort((a, b) => b.records.length - a.records.length);
+			groupedSalesArray.sort((a, b) => {
+        const recordDiff = b.records.length - a.records.length;
+
+        if (recordDiff !== 0) {
+          return recordDiff; // sort by record count (descending)
+        }
+
+        return a.name.localeCompare(b.name); // sort by name (ascending)
+      });
 
 			console.log("Grouped Sales: ", groupedSalesArray);
 			
