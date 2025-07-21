@@ -553,11 +553,6 @@
 
   });
 
-  function show_spinner(){
-    document.getElementById("overlay").style.display = "block";
-    $('#spinner').show();
-  }
-
   function confirmAndShowSpinner(event, confirmMessage) {
     
     if (!confirm(confirmMessage)) {
@@ -569,9 +564,57 @@
     show_spinner();
   }
 
+  function deleteSalesRecord(event) {
+    event.preventDefault();
+
+    if (!confirm("Are you sure you want to delete this Sales Record?")) return;
+
+    const button = event.currentTarget;
+    const salesRecordId = button.dataset.salesRecordId;
+
+    fetch(`/sales_records/${salesRecordId}`, {
+      method: "DELETE",
+      headers: {
+        "X-CSRF-Token": document.querySelector("meta[name='csrf-token']").content,
+        "Accept": "application/json"
+      }
+    }).then(response => {
+      if (response.ok) {
+        // Remove the row
+        const row = button.closest("tr");
+        if (row) row.remove();
+
+        const countEl = document.getElementById("currentCount");
+        if (countEl) {
+          let newCount = parseInt(countEl.innerText) - 1;
+          countEl.innerText = newCount >= 0 ? newCount : 0;
+        }
+
+        const totalEl = document.getElementById("totalCount");
+        if (totalEl) {
+          let newCount = parseInt(totalEl.innerText) - 1;
+          totalEl.innerText = newCount >= 0 ? newCount : 0;
+        }
+
+        alertMessage("Sales Record was deleted","SUCCESS",2500);
+
+      } else {
+        alertMessage("Failed to delete record","DANGER",2500);
+      }
+    }).catch(error => {
+      console.error("Error deleting record:", error);
+      alertMessage("","DANGER",2500);
+    });
+  }
+
   function hide_spinner(){
     document.getElementById("overlay").style.display = "none";
     $('#spinner').hide();
+  }
+
+  function show_spinner(){
+    document.getElementById("overlay").style.display = "block";
+    $('#spinner').show();
   }
 
   var currentAlertIds = {

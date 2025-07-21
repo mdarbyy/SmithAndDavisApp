@@ -1,0 +1,19 @@
+const form = document.querySelector(
+  'form[data-sales-record-id="<%= @sales_record.id %>"]'
+);
+if (form) {
+  const row = form.closest("tr");
+  if (row) row.remove();
+}
+
+const currentCount = document.getElementById("currentCount");
+if (currentCount) {
+  const newCount = parseInt(currentCount.innerText) - 1;
+  currentCount.innerText = newCount;
+}
+
+const totalCount = document.getElementById("totalCount");
+if (totalCount) {
+  const newTotalCount = parseInt(totalCount.innerText) - 1;
+  totalCount.innerText = newTotalCount;
+}

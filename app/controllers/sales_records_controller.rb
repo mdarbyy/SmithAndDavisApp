@@ -57,7 +57,10 @@ class SalesRecordsController < ApplicationController
   # DELETE /sales_records/1 or /sales_records/1.json
   def destroy
     @sales_record.destroy
-    redirect_to sales_records_path, success: 'Sales Record was deleted'
+    respond_to do |format|
+      format.html { redirect_to sales_people_path, success: 'Sales Record was deleted' }
+      format.json { head :no_content }
+    end
   end
 
   def create_multiple_sales_records
