@@ -118,6 +118,9 @@
 
       #content-main {
         height: calc(100vh - 70px - 75px);
+        overflow: hidden; /* hide overflow, keep height fixed */
+        display: flex;
+        flex-direction: column;
       }
 
       #content-search {
@@ -334,6 +337,8 @@
         overflow-x: hidden;
         scrollbar-width: none;
         margin-top: 70px;
+        height: 100vh;
+        overflow-y: hidden;
       }
 
       .main-content::-webkit-scrollbar {
@@ -353,6 +358,10 @@
         max-height: 85vh;
       }
 
+      .scrollable-form {
+        flex-grow: 1;
+      }
+      
       .scrollable-form, .scrollable-table, #content-scroll {
         overflow-y: auto;
         scrollbar-width: none;

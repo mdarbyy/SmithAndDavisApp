@@ -83,6 +83,21 @@
       const timestamp = Date.now();
       const newItemHTML = template.replace(/__TIMESTAMP__/g, timestamp);
       itemList.insertAdjacentHTML("beforeend", newItemHTML);
+
+      // Re-initialize Select2 on the newly added select element
+      const newSelect = itemList.querySelectorAll("select.select2");
+      const lastSelect = newSelect[newSelect.length - 1];
+      if (lastSelect) {
+        $(lastSelect).select2({
+          width: '100%',
+          dropdownAutoWidth: true
+        });
+
+        const select2Container = $(lastSelect).data('select2').$container;
+        if (select2Container) {
+          select2Container.css('display', 'block');
+        }
+      }
       updateSubmitButtonVisibility();
     });
 
