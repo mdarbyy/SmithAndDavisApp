@@ -5,7 +5,10 @@ class SalesRecordsController < ApplicationController
   def index
     @limit = Setting.first.entity_limit
     offset = params[:offset].to_i || 0
-    @sales_records = SalesRecord.all.limit(@limit).offset(offset).order(id: :desc)
+    @sales_records = SalesRecord.includes(:sales_person, :item)
+                              .limit(@limit)
+                              .offset(offset)
+                              .order(id: :desc)
     @total_records = SalesRecord.all.count
 
     respond_to do |format|
