@@ -1,6 +1,6 @@
 <% if @start_date.blank? || @end_date.blank? %>
   <div class="d-flex justify-content-center align-items-center" style="min-height: 60vh;">
-    <div class="card p-4 dashboard-card" style="max-width: 500px; width: 100%;">
+    <div class="card p-4 dashboard-card" style="max-width: 450px; width: 100%;">
       <h4 class="mb-3 text-center">Select a Date Range</h4>
       <%= form_with url: dashboard_path, method: :get, local: true do |form| %>
         <div class="mb-3">
@@ -31,9 +31,9 @@
     
 	<div class="modal fade" id="totalSalesModal" tabindex="-1" aria-labelledby="totalSalesModalLabel" aria-hidden="true">
 		<div class="modal-dialog custom-modal">
-			<div class="modal-content" style="width: 750px;">
+			<div class="modal-content">
 				<div class="modal-header">
-					<h5 class="modal-title" id="totalSalesModalLabel">Sales Records for <b><span id="salesPersonName"></span></b> (<span id="salesPersonRecordCount"></span>)</h5>
+					<h5 class="modal-title" id="totalSalesModalLabel"><b><span id="salesPersonName"></span></b> (<span id="salesPersonRecordCount"></span>)</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
 				<div class="modal-body custom-modal">
@@ -57,7 +57,7 @@
 
 	<div class="modal fade" id="salesBreakdownModal" tabindex="-1" aria-labelledby="salesBreakdownModalLabel" aria-hidden="true">
 		<div class="modal-dialog custom-modal">
-			<div class="modal-content" style="width: 750px;">
+			<div class="modal-content">
 				<div class="modal-header">
 					<h5 class="modal-title" id="salesBreakdownModalLabel"><b><span id="itemName"></b></span> (<span id="itemCount"></span>)</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -138,7 +138,7 @@
 
 							<div class="row">
 								<div class="col">
-									<div id="sales-bar-chart" class="dashboard-content"></div>
+									<div id="total-sales-chart" class="dashboard-content"></div>
 								</div>
 							</div>
 							
@@ -321,7 +321,7 @@
           };
         });
 
-				Highcharts.chart('sales-bar-chart', {
+				Highcharts.chart('total-sales-chart', {
 					chart: {
 						type: 'column',
             marginTop: 80
