@@ -6,9 +6,9 @@ class SalesRecordsController < ApplicationController
     @limit = Setting.first.entity_limit
     offset = params[:offset].to_i || 0
     @sales_records = SalesRecord.includes(:sales_person, :item)
-                              .limit(@limit)
-                              .offset(offset)
-                              .order(id: :desc)
+    .limit(@limit)
+    .offset(offset)
+    .order(id: :desc)
     @total_records = SalesRecord.all.count
 
     respond_to do |format|
@@ -61,7 +61,7 @@ class SalesRecordsController < ApplicationController
   def destroy
     @sales_record.destroy
     respond_to do |format|
-      format.html { redirect_to sales_people_path, success: 'Sales Record was deleted' }
+      format.html { redirect_to sales_records_path, success: 'Sales Record was deleted' }
       format.json { head :no_content }
     end
   end

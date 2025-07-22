@@ -54,16 +54,15 @@
     </div>
 
     <div style="text-align: center;" id="recordCount">
-      <b>Displaying <span id="currentCount">0</span> of <%= @total_records %> Sales People</b>
+      <b>Displaying <span id="currentCount">0</span> of <span id="totalCount"><%= @total_records %></span> Sales People</b>
     </div>
   </div>
 </div>
 
 <script>
-  var offset1 = <%= Setting.first.entity_limit %>;
   var isLoading = false;
 
-  $( document ).ready(function() {
+  $(document).ready(function() {
     var rowCount = $('#content-table tbody tr').length;
     $('#currentCount').text(rowCount);
 
@@ -73,14 +72,11 @@
         $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
       });
     });
-
   });
 
   $("#content-scroll").scroll(function() {
-    var totalRecords = <%= @total_records %>;
+    var totalRecords = parseInt($('#totalCount').text());
     var currentCount = parseInt($('#currentCount').text());
-
-    // Check if current count is less than total records before calling loadMoreRecords
     if (currentCount < totalRecords) {
       if ($("#content-scroll").scrollTop() >= $("#content-table").height() - $("#content-scroll").height() && !isLoading) {
         loadMoreRecords();
@@ -89,12 +85,13 @@
   });
 
   function loadMoreRecords() {
-
     if (isLoading) return;
-    console.log("loading");
+    console.log("Loading Sales People");
+    const currentVisibleCount = $('#content-table tbody tr').length;
+
     $.ajax({
       url: "sales_people",
-      data: { offset: offset1 },
+      data: { offset: currentVisibleCount },
       type: 'GET',
       dataType: 'script',
       cache: true,
@@ -103,8 +100,7 @@
         $("#loading-spinner").show();
       },
       success: function(data) {
-        offset1 += <%= Setting.first.entity_limit %>;
-        console.log("loaded");
+        console.log("Loaded Sales People");
         var rowCount = $('#content-table tbody tr').length;
         $('#currentCount').text(rowCount);
       },

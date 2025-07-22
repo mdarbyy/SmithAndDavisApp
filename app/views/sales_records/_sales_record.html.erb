@@ -4,9 +4,12 @@
   <td><%= "#{sales_record.sales_person.first_name} #{sales_record.sales_person.last_name}" %></td>
   <td><%= sales_record.sell_date.strftime("%m/%d/%Y") %></td>
   <td>
-    <button class="btn btn-delete btn-right"
-      data-sales-record-id="<%= sales_record.id %>"
-      onclick="deleteSalesRecord(event)">
+    <button class="btn btn-delete"
+      type="button"
+      data-entity="sales_records"
+      data-entity-name="Sales Record"
+      data-id="<%= sales_record.id %>"
+      onclick="deleteEntity(event)">
       Delete
     </button>
   </td>

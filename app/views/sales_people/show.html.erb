@@ -34,9 +34,11 @@
                 <td><%= sales_record.item.name %></td>
                 <td><%= sales_record.item_price %></td>
                 <td>
-                  <button class="btn btn-delete btn-right"
-                    data-sales-record-id="<%= sales_record.id %>"
-                    onclick="deleteSalesRecord(event)">
+                  <button class="btn btn-delete"
+                    data-entity="sales_records"
+                    data-entity-name="Sales Record"
+                    data-id="<%= sales_record.id %>"
+                    onclick="deleteEntity(event)">
                     Delete
                   </button>
                 </td>
@@ -84,5 +86,4 @@
       });
     });
   });
-
 </script>

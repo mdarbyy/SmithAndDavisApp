@@ -1,9 +1,15 @@
 <tr>
   <td><%= link_to item.name, edit_item_path(item), class: "nav-link" %></td>
-  <% sales_records = SalesRecord.where(item_id: item.id) %>
   <td>
-    <% if sales_records.count == 0 %>
-      <%= button_to 'Delete', item_path(item), method: :delete, class: 'btn btn-delete btn-right', onclick: "confirmAndShowSpinner(event, 'Are you sure you want to delete this Item?')", style:"margin-top: 0;" %>
+    <% unless item.sales_records.present? %>
+      <button class="btn btn-delete"
+      type="button"
+      data-entity="items"
+      data-entity-name="Item"
+      data-id="<%= item.id %>"
+      onclick="deleteEntity(event)">
+      Delete
+    </button>
     <% end %>
   </td>
 </tr>

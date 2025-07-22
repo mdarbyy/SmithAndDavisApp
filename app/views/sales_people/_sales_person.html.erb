@@ -1,17 +1,21 @@
 <tr>
   <td><%= link_to sales_person.first_name + " " + sales_person.last_name, edit_sales_person_path(sales_person), class: "nav-link" %></td>
-  
-  <% sales_records = SalesRecord.where(sales_person_id: sales_person.id) %>
 
   <td>
-    <% if sales_records.present? %>
+    <% if sales_person.sales_records.present? %>
       <%= button_to 'View Sales Records', sales_person_path(sales_person), method: :get, class: 'btn btn-main', style:"margin-top: 0;" %>
     <% end %>
   </td>
   
   <td>
-    <% unless sales_records.present? %>
-      <%= button_to 'Delete', sales_person_path(sales_person), method: :delete, class: 'btn btn-delete', onclick: "confirmAndShowSpinner(event, 'Are you sure you want to delete this Sales Person?')", style:"margin-top: 0;" %>
+    <% unless sales_person.sales_records.present? %>
+      <button class="btn btn-delete" type="button"
+      data-entity="sales_people"
+      data-entity-name="Sales Person"
+      data-id="<%= sales_person.id %>"
+      onclick="deleteEntity(event)">
+      Delete
+    </button>
     <% end %>
   </td>
 

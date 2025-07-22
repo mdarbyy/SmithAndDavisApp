@@ -5,7 +5,7 @@ class SalesPeopleController < ApplicationController
   def index
     @limit = Setting.first.entity_limit
     offset = params[:offset].to_i || 0
-    @sales_people = SalesPerson.all.limit(@limit).offset(offset).order(first_name: :asc, last_name: :asc)
+    @sales_people = SalesPerson.all.includes(:sales_records).limit(@limit).offset(offset).order(first_name: :asc, last_name: :asc)
     @total_records = SalesPerson.all.count
 
     respond_to do |format|
@@ -58,7 +58,10 @@ class SalesPeopleController < ApplicationController
   # DELETE /sales_people/1 or /sales_people/1.json
   def destroy
     @sales_person.destroy
-    redirect_to sales_people_path, success: 'Sales Person was deleted'
+    respond_to do |format|
+      format.html { redirect_to sales_people_path, success: 'Sales Person was deleted' }
+      format.json { head :no_content }
+    end
   end
 
   private
