@@ -504,6 +504,10 @@
 				const itemName = itemData.name;
 				const records = itemData.records;
 
+        records.sort((a, b) => 
+          luxon.DateTime.fromISO(a.sell_date) - luxon.DateTime.fromISO(b.sell_date)
+        );
+
 				// Set modal title values
 				$('#itemName').text(itemName);
 				$('#itemCount').text(records.length);
