@@ -324,7 +324,7 @@
 				Highcharts.chart('total-sales-chart', {
 					chart: {
 						type: 'column',
-            marginTop: 80
+            marginTop: 100
 					},
 					title: {
 						<% if @start_date == @end_date %>
@@ -374,7 +374,6 @@
                 inside: false,
                 crop: false,
                 overflow: 'none',
-                y: -4,
                 useHTML: true,
                 formatter: function() {
                   const sales = '$' + Highcharts.numberFormat(this.y, 0, '.', ',');

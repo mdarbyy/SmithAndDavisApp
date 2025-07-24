@@ -1,5 +1,5 @@
 class Item < ApplicationRecord
-  validate :unique_item
+  before_create :unique_item
   validates :name, presence: true
 
   has_many :sales_records
@@ -7,8 +7,9 @@ class Item < ApplicationRecord
   private
 
   def unique_item
-    if Item.where(name: name.titleize).exists?
+    if Item.where("LOWER(name) LIKE ?", "%#{name.downcase}%").exists?
       errors.add(:base, "This Item already exists")
+      throw(:abort)
     end
   end
 end
