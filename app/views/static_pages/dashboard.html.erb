@@ -327,20 +327,27 @@
             marginTop: 130
 					},
 					title: {
-						<% if @start_date == @end_date %>
-							text: 'Total Sales for <%= @start_date.strftime("%m/%d/%Y") %>'
-						<% else %>
-							text: 'Total Sales from <%= @start_date.strftime("%m/%d/%Y") %> to <%= @end_date.strftime("%m/%d/%Y") %>'
-						<% end %>
+            useHTML: true,
+						text: 
+            `<div style="text-align: center;">
+              <div style="font-size: 24px; font-weight: bold; color: #333;">
+                <% if @start_date == @end_date %>
+                  Total Sales for <%= @start_date.strftime("%m/%d/%Y") %>
+                <% else %>
+                  Total Sales from <%= @start_date.strftime("%m/%d/%Y") %> to <%= @end_date.strftime("%m/%d/%Y") %>
+                <% end %>
+              </div>
+            </div>
+            `
 					},
 					subtitle: {
 						useHTML: true,
             text: `
               <div style="text-align: center;">
-                <div style="font-size: 18px; font-weight: bold; color: #333;">
+                <div style="font-size: 20px; font-weight: bold; color: #333;">
                   $${Highcharts.numberFormat(totalSales, 0, '.', ',')}
                 </div>
-                <div style="font-size: 12px; font-weight: bold; color: #777;">
+                <div style="font-size: 14px; font-weight: bold; color: #777;">
                   ${filteredSales.length} sale${filteredSales.length === 1 ? '' : 's'}
                 </div>
               </div>

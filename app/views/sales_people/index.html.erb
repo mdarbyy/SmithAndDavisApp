@@ -62,18 +62,6 @@
 <script>
   var isLoading = false;
 
-  $(document).ready(function() {
-    var rowCount = $('#content-table tbody tr').length;
-    $('#currentCount').text(rowCount);
-
-    $("#content-search").on("keyup", function() {
-      var value = $(this).val().toLowerCase();
-      $("#content-table-body tr").filter(function() {
-        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-      });
-    });
-  });
-
   $("#content-scroll").scroll(function() {
     var totalRecords = parseInt($('#totalCount').text());
     var currentCount = parseInt($('#currentCount').text());

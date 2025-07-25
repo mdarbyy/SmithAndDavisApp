@@ -498,7 +498,7 @@
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0"> 
                   <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 18px;">
-                      <%= current_user.email %>
+                      <%= current_user.first_name %> <%= current_user.last_name %>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown"> 
                       <li>
@@ -559,11 +559,22 @@
     });
 
     $('.datepicker-icon').on('click', function() {
-      // Find closest .input-group ancestor, then find .datepicker input inside it
       const $input = $(this).closest('.input-group').find('.datepicker');
       $input.datepicker('show');
     });
 
+    var rowCount = $('#content-table tbody tr').length;
+    $('#currentCount').text(rowCount);
+
+    $("#content-search").on("keyup", function() {
+      var value = $(this).val().toLowerCase();
+      $("#content-table-body tr").filter(function() {
+        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+      });
+      var visibleCount = $("#content-table-body tr:visible").length;
+      $('#currentCount').text(visibleCount);
+    });
+ 
   });
 
   function confirmAndShowSpinner(event, confirmMessage) {

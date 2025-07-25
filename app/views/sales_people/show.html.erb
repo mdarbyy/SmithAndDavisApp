@@ -16,7 +16,6 @@
   
   <div class="card m-1 p-2" id="content-main">
     <div id="content-scroll">
-
       <% if @sales_records.present? and @sales_records.count > 0 %>
         <table class="table content" id="content-table">
           <thead>
@@ -73,17 +72,3 @@
     </div>
   </div>
 </div>
-
-<script>
-  $( document ).ready(function() {
-    var rowCount = $('#content-table tbody tr').length;
-    $('#currentCount').text(rowCount);
-
-    $("#content-search").on("keyup", function() {
-      var value = $(this).val().toLowerCase();
-      $("#content-table-body tr").filter(function() {
-        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-      });
-    });
-  });
-</script>
