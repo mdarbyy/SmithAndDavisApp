@@ -324,7 +324,7 @@
 				Highcharts.chart('total-sales-chart', {
 					chart: {
 						type: 'column',
-            marginTop: 100
+            marginTop: 130
 					},
 					title: {
 						<% if @start_date == @end_date %>
@@ -334,23 +334,21 @@
 						<% end %>
 					},
 					subtitle: {
-						text: `$${Highcharts.numberFormat(totalSales, 0, '.', ',')} (${filteredSales.length})`,
-						style: {
-							fontSize: '16px', 
-							color: '#333'
-						}
+						useHTML: true,
+            text: `
+              <div style="text-align: center;">
+                <div style="font-size: 18px; font-weight: bold; color: #333;">
+                  $${Highcharts.numberFormat(totalSales, 0, '.', ',')}
+                </div>
+                <div style="font-size: 12px; font-weight: bold; color: #777;">
+                  ${filteredSales.length} sale${filteredSales.length === 1 ? '' : 's'}
+                </div>
+              </div>
+            `
 					},
 					xAxis: {
 						categories: categories,
 						title: { text: 'Sales Person' },
-            labels: {
-              style: {
-                width: '80px',
-                textOverflow: 'ellipsis',
-                overflow: 'hidden',
-                whiteSpace: 'nowrap'
-              }
-            }
 					},
 					yAxis: {
 						min: 0,
