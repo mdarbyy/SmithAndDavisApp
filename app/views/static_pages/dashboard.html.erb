@@ -84,32 +84,56 @@
 	<div class="container-fluid">
 		<div class="row">
 			<div class="col-12 col-md-3">
-				<div class="card p-4 dashboard-card">
-					<h5 class="mb-3 text-center">Change the Date Range</h5>
-					<%= form_with url: dashboard_path, method: :get, local: true do |form| %>
-						<div class="mb-3">
-							<%= form.label :start_date, "Start Date", class: "form-label" %>
-							<div class="input-group">
-                <%= form.text_field :start_date, class: "form-control datepicker", required: true, value: (params[:start_date].presence || Date.current.strftime("%m/%d/%Y")) %>
-                <span class="input-group-text datepicker-icon">
-                  <i class="bi bi-calendar-date"></i>
-                </span>
-              </div>
-						</div>
-						<div class="mb-3">
-							<%= form.label :end_date, "End Date", class: "form-label" %>
-							<div class="input-group">
-                <%= form.text_field :end_date, class: "form-control datepicker", required: true, value: (params[:end_date].presence || Date.current.strftime("%m/%d/%Y")) %>
-                <span class="input-group-text datepicker-icon">
-                  <i class="bi bi-calendar-date"></i>
-                </span>
-              </div>
-						</div>
-						<div class="d-flex justify-content-end">
-							<%= form.submit "Submit", class: "btn btn-main", onclick:"show_spinner()" %>
-						</div>
-					<% end %>
-				</div>
+				<div class="row mb-4">
+          <div class="col">
+            <div class="card p-4 dashboard-card">
+              <h5 class="mb-3 text-center">Change the Date Range</h5>
+              <%= form_with url: dashboard_path, method: :get, local: true do |form| %>
+                <div class="mb-3">
+                  <%= form.label :start_date, "Start Date", class: "form-label" %>
+                  <div class="input-group">
+                    <%= form.text_field :start_date, class: "form-control datepicker", required: true, value: (params[:start_date].presence || Date.current.strftime("%m/%d/%Y")) %>
+                    <span class="input-group-text datepicker-icon">
+                      <i class="bi bi-calendar-date"></i>
+                    </span>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <%= form.label :end_date, "End Date", class: "form-label" %>
+                  <div class="input-group">
+                    <%= form.text_field :end_date, class: "form-control datepicker", required: true, value: (params[:end_date].presence || Date.current.strftime("%m/%d/%Y")) %>
+                    <span class="input-group-text datepicker-icon">
+                      <i class="bi bi-calendar-date"></i>
+                    </span>
+                  </div>
+                </div>
+                <div class="d-flex justify-content-end">
+                  <%= form.submit "Submit", class: "btn btn-main", onclick:"show_spinner()" %>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <div class="card p-4 dashboard-card">
+              <h5 class="mb-2 text-center">Filters</h5>
+
+              <div class="row mb-3">
+								<div class="col d-flex flex-column align-items-center">
+									<select id="sales-person-filter" class="selectpicker btn-secondary filter-select" multiple data-actions-box="true" title="Sales People" data-selected-text-format="count" data-count-selected-text="{0} people selected" data-width="100%"></select>
+								</div>
+							</div>
+
+              <div class="row">
+								<div class="col d-flex flex-column align-items-center">
+									<select id="item-filter" class="selectpicker btn-secondary filter-select" multiple data-actions-box="true" title="Items" data-selected-text-format="count" data-count-selected-text="{0} items selected" data-width="100%"></select>
+								</div>
+							</div>
+            </div>
+          </div>
+        </div>
 			</div>
 
 			<div class="col-12 col-md-9">
@@ -129,28 +153,13 @@
 				<div class="card border-top-0 rounded-bottom dashboard-card">
 					<div class="card-body tab-content" id="dashboardTabsContent">
 						<div class="tab-pane fade show active" id="total-sales" role="tabpanel" aria-labelledby="total-sales-tab">
-							
-							<div class="row mb-3">
-								<div class="col d-flex flex-column align-items-center">
-									<select id="sales-person-filter" class="selectpicker btn-secondary" multiple data-actions-box="true" title="Sales People" data-selected-text-format="count" data-count-selected-text="{0} people selected" data-width="100%"></select>
-								</div>
-							</div>
-
 							<div class="row">
 								<div class="col">
 									<div id="total-sales-chart" class="dashboard-content"></div>
 								</div>
 							</div>
-							
 						</div>
 						<div class="tab-pane fade show" id="sales-breakdown" role="tabpanel" aria-labelledby="sales-breakdown-tab">
-							
-							<div class="row mb-3">
-								<div class="col d-flex flex-column align-items-center">
-									<select id="item-filter" class="selectpicker btn-secondary" multiple data-actions-box="true" title="Items" data-selected-text-format="count" data-count-selected-text="{0} items selected" data-width="100%"></select>
-								</div>
-							</div>
-
 							<div class="row">
 								<div class="col">
 									<div class="scrollable-table dashboard-content">
@@ -192,22 +201,25 @@
 				salesPersonIdToName[sp.id] = name;
 			});
 
-			const totalsByPerson = {};
-			salesRecords.forEach(record => {
-				const name = (salesPersonIdToName[record.sales_person_id]).trim().replace(/\s+/g, ' ');
-				const price = Number(record.item_price);
-
-				if (!totalsByPerson[name]) totalsByPerson[name] = 0;
-				totalsByPerson[name] += price;
-			});
-
-			const allSortedData = Object.entries(totalsByPerson).sort((a, b) => a[0].localeCompare(b[0]));
-			console.log(allSortedData);
-
-			const itemIdToName = {};
+      const itemIdToName = {};
 			Items.forEach(item => {
 				itemIdToName[item.id] = item.name;
 			});
+
+			const totalsByPerson = {};
+      salesRecords.forEach(record => {
+        const name = (salesPersonIdToName[record.sales_person_id] || '').trim().replace(/\s+/g, ' ');
+        const itemId = record.item_id;
+        const item = itemIdToName[itemId];
+        const price = Number(record.item_price);
+
+        if (!totalsByPerson[name]) totalsByPerson[name] = {};
+        if (!totalsByPerson[name][item]) totalsByPerson[name][item] = 0;
+        totalsByPerson[name][item] += price;
+      });
+
+			const allSortedData = Object.entries(totalsByPerson).sort((a, b) => a[0].localeCompare(b[0]));
+			console.log(allSortedData);
 
 			const groupedSales = {};
 			salesRecords.forEach(record => {
@@ -218,6 +230,7 @@
 					};
 				}
 				groupedSales[record.item_id].records.push(record);
+        record.sales_person_name = salesPersonIdToName[record.sales_person_id];
 			});
 
 			const groupedSalesArray = Object.entries(groupedSales).map(([item_id, data]) => ({
@@ -236,13 +249,15 @@
         return a.name.localeCompare(b.name); // sort by name (ascending)
       });
 
-			console.log("Grouped Sales: ", groupedSalesArray);
-			
-			function populateSalesBreakdownItemSelect(){
+			function populateItemSelect(){
 				const select = $('#item-filter');
 				select.find('option').remove();
 
-				const optionsHtml = groupedSalesArray.map(item =>
+				const sortedItems = [...groupedSalesArray].sort((a, b) =>
+          a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+        );
+        
+        const optionsHtml = sortedItems.map(item =>
 					new Option(item.name, item.item_id, true, true).outerHTML
 				).join('');
 
@@ -251,7 +266,7 @@
 				select.selectpicker();
 			}
 			
-			function populateTotalSalesSalesPersonSelect() {
+			function populateSalesPersonSelect() {
 				const uniqueNames = [...new Set(allSortedData.map(([name]) => name))].sort();
 
 				let select = $('#sales-person-filter');
@@ -268,33 +283,52 @@
 
 			function renderSalesBreakdownTable(){
 				const selectedItemIds = $('#item-filter').val();
+        const selectedSalesPeople = $('#sales-person-filter').val();
+        
 				const tableBody = $('#salesBreakdownTableBody');
   			tableBody.empty();
 				if (!selectedItemIds || selectedItemIds.length === 0) return;
 
 				// Filter to only selected items
-				const filteredItems = groupedSalesArray.filter(item =>
+				let filteredItems = groupedSalesArray.filter(item =>
 					selectedItemIds.includes(item.item_id)
 				);
 
-				filteredItems.forEach(item => {
-					const rowHtml = `
-						<tr>
-							<td>${item.name}</td>
-							<td><a href="#" class="nav-link clickable-item" data-item-id="${item.item_id}">${item.records.length}</a></td>
-						</tr>
-					`;
-					tableBody.append(rowHtml);
-				});
+				filteredItems = filteredItems.map(item => {
+          const filteredRecords = item.records.filter(record =>
+            selectedSalesPeople.includes(record.sales_person_name)
+          );
+          return {
+            ...item,
+            records: filteredRecords
+          };
+        }).filter(item => item.records.length > 0);
 
+        filteredItems.forEach(item => {
+          const rowHtml = `
+            <tr>
+              <td>${item.name}</td>
+              <td><a href="#" class="nav-link clickable-item" data-item-id="${item.item_id}">${item.records.length}</a></td>
+            </tr>
+          `;
+          tableBody.append(rowHtml);
+        });
 			}
 			
 			function renderTotalSalesChart() {
-				const selectedNames = $('#sales-person-filter').val();	
+				const selectedNames = $('#sales-person-filter').val();
+        const selectedItems = $('#item-filter').val();
+        const selectedItemNames = selectedItems
+        .map(id => itemIdToName[id.toString()])
+        .filter(name => !!name);	
 
-				const filteredData = allSortedData.filter(([name]) =>
-          selectedNames.includes(name)
-        );
+				const filteredData = selectedNames.map(name => {
+          const itemTotals = totalsByPerson[name] || {};
+          const total = Object.entries(itemTotals)
+            .filter(([itemName]) => selectedItemNames.includes(itemName))
+            .reduce((sum, [, amount]) => sum + amount, 0);
+          return [name, total];
+        }).filter(([, total]) => total > 0);
 
 				const nameToSalesPersonId = {};
 				Object.entries(salesPersonIdToName).forEach(([id, name]) => {
@@ -303,9 +337,10 @@
 
 				const selectedIds = selectedNames.map(name => nameToSalesPersonId[name]);
 				// Count how many sales_records match those sales_person_ids
-				const filteredSales = salesRecords.filter(record => 
-					selectedIds.includes(record.sales_person_id)
-				);
+				const filteredSales = salesRecords.filter(record =>
+          selectedIds.includes(record.sales_person_id) &&
+          selectedItems.includes(record.item_id.toString())
+        );
 
         const totalSales = filteredSales.reduce((accumulator, sale) =>{
           return accumulator + sale.item_price;
@@ -314,7 +349,10 @@
 				const categories = filteredData.map(([name]) => name);
 				const data = filteredData.map(([name, total]) => {
           const id = nameToSalesPersonId[name];
-          const count = salesRecords.filter(record => record.sales_person_id === id).length;
+          const count = salesRecords.filter(record =>
+            record.sales_person_id === id &&
+            selectedItems.includes(record.item_id.toString())
+          ).length;
           return {
             y: total,
             custom: { count: count }
@@ -330,7 +368,7 @@
             useHTML: true,
 						text: 
             `<div style="text-align: center;">
-              <div style="font-size: 24px; font-weight: bold; color: #333;">
+              <div style="font-size: 22px; font-weight: bold; color: #333;">
                 <% if @start_date == @end_date %>
                   Total Sales for <%= @start_date.strftime("%m/%d/%Y") %>
                 <% else %>
@@ -344,7 +382,7 @@
 						useHTML: true,
             text: `
               <div style="text-align: center;">
-                <div style="font-size: 20px; font-weight: bold; color: #333;">
+                <div style="font-size: 18px; font-weight: bold; color: #333;">
                   $${Highcharts.numberFormat(totalSales, 0, '.', ',')}
                 </div>
                 <div style="font-size: 14px; font-weight: bold; color: #777;">
@@ -411,9 +449,13 @@
 					id => salesPersonIdToName[id] === clickedName
 				);
 
-				const filteredRecords = salesRecords
-					.filter(record => record.sales_person_id == salesPersonId)
-					.sort((a, b) => new Date(a.sell_date) - new Date(b.sell_date));
+				const selectedItemIds = $('#item-filter').val() || [];
+
+        const filteredRecords = salesRecords
+        .filter(record =>
+          record.sales_person_id == salesPersonId &&
+          selectedItemIds.includes(record.item_id.toString())
+        );
 
 				console.log(`Sales records for ${clickedName}:`, filteredRecords);
 				document.getElementById('salesPersonName').textContent = clickedName;
@@ -484,17 +526,19 @@
 				modal.show();
 			}
 
-			populateTotalSalesSalesPersonSelect();
+			populateSalesPersonSelect();
+      populateItemSelect();
 			renderTotalSalesChart();
-			populateSalesBreakdownItemSelect();
 			renderSalesBreakdownTable();
 
 			$('#item-filter').on('changed.bs.select', function () {
-				renderSalesBreakdownTable();
+				renderTotalSalesChart();
+        renderSalesBreakdownTable();
 			});
 
 			$('#sales-person-filter').on('changed.bs.select', function () {
   			renderTotalSalesChart();
+        renderSalesBreakdownTable();
 			});
 
 			$(document).on('click', '.clickable-item', function (e) {

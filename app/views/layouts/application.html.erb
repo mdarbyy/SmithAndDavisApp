@@ -208,6 +208,11 @@
         background-color: #e3e7ebff !important;
       }
 
+      .bootstrap-select.filter-select .dropdown-menu.inner {
+        max-height: 350px;
+        overflow-y: auto !important;
+      }
+
       .btn-delete {
         background-color: #a8504b;
         color: white !important;
@@ -255,7 +260,7 @@
       }
 
       .dashboard-content {
-        height: calc(100vh - 210px);
+        height: calc(100vh - 155px);
         width: 100%;
       }
 
@@ -446,76 +451,73 @@
     <% if user_signed_in? %>
       <div class="d-flex flex-column h-100 authenticated">
         <div class="container-fluid h-100 d-flex flex-row p-0">
-        
-        <!-- Navigation Sidebar -->
-        <div class="position-relative d-flex flex-column" id="nav-sidebar">
-          
-          <div class="row">
-            <div class="col">
-              <h4 class="text-center">
-                <%= image_tag 'logo.png', class: "logo" %>
-              </h4>
+          <div class="position-relative d-flex flex-column" id="nav-sidebar">
+            
+            <div class="row">
+              <div class="col">
+                <h4 class="text-center">
+                  <%= image_tag 'logo.png', class: "logo" %>
+                </h4>
+              </div>
             </div>
-          </div>
-          
-          <div class="row flex-grow-1 align-items-center">
-            <div class="col">
-              <ul class="list-group list-group-flush">
-                <li class="list-group-item">
-                  <%= link_to "Dashboard", dashboard_path, class: "dashboard-link sidebar-nav-link #{'active' if current_page?(dashboard_path) or current_page?(root_path)}" %>
-                </li>
-                <li class="list-group-item">
-                  <%= link_to "Items", items_path, class: "dashboard-link sidebar-nav-link #{'active' if current_page?(items_path)}" %>
-                </li>
-                <li class="list-group-item">
-                  <%= link_to "Sales People", sales_people_path, class: "dashboard-link sidebar-nav-link #{'active' if current_page?(sales_people_path)}" %>
-                </li>
-                <li class="list-group-item">
-                  <%= link_to "Sales Records", sales_records_path, class: "dashboard-link sidebar-nav-link #{'active' if current_page?(sales_records_path)}" %>
-                </li>
-                <li class="list-group-item">
-                  <%= link_to "Users", users_path, class: "dashboard-link sidebar-nav-link #{'active' if current_page?(users_path)}" %>
-                </li>
-                <li class="list-group-item text-center">
-                  <% if Setting.exists? %>
-                    <%= link_to "Settings", edit_setting_path(Setting.first), class: "dashboard-link sidebar-nav-link #{'active' if current_page?(edit_setting_path(Setting.first))}" %>
-                  <% else %>
-                    <%= link_to "Settings", settings_path, class: "dashboard-link sidebar-nav-link #{'active' if current_page?(settings_path)}" %>
-                  <% end %>
-                </li>
-              </ul>
-            </div>
-          </div>  
-        </div>
-
-        <div class="main-content">
-          <div class="navbar navbar-expand-lg fixed-top" id="nav-header">
-            <div class="container-fluid">
-              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-              </button>
-              <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav ms-auto mb-2 mb-lg-0"> 
-                  <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 18px;">
-                      <%= current_user.first_name %> <%= current_user.last_name %>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown"> 
-                      <li>
-                        <%= link_to "Profile", edit_user_path(current_user), class: "dropdown-item nav-link" %>
-                      </li>
-                      <li>
-                        <%= button_to "Log Out", destroy_user_session_path, method: :delete, class: "dropdown-item nav-link" %>
-                      </li>
-                    </ul>
+            
+            <div class="row flex-grow-1 align-items-center">
+              <div class="col">
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item">
+                    <%= link_to "Dashboard", dashboard_path, class: "dashboard-link sidebar-nav-link #{'active' if current_page?(dashboard_path) or current_page?(root_path)}" %>
+                  </li>
+                  <li class="list-group-item">
+                    <%= link_to "Items", items_path, class: "dashboard-link sidebar-nav-link #{'active' if current_page?(items_path)}" %>
+                  </li>
+                  <li class="list-group-item">
+                    <%= link_to "Sales People", sales_people_path, class: "dashboard-link sidebar-nav-link #{'active' if current_page?(sales_people_path)}" %>
+                  </li>
+                  <li class="list-group-item">
+                    <%= link_to "Sales Records", sales_records_path, class: "dashboard-link sidebar-nav-link #{'active' if current_page?(sales_records_path)}" %>
+                  </li>
+                  <li class="list-group-item">
+                    <%= link_to "Users", users_path, class: "dashboard-link sidebar-nav-link #{'active' if current_page?(users_path)}" %>
+                  </li>
+                  <li class="list-group-item text-center">
+                    <% if Setting.exists? %>
+                      <%= link_to "Settings", edit_setting_path(Setting.first), class: "dashboard-link sidebar-nav-link #{'active' if current_page?(edit_setting_path(Setting.first))}" %>
+                    <% else %>
+                      <%= link_to "Settings", settings_path, class: "dashboard-link sidebar-nav-link #{'active' if current_page?(settings_path)}" %>
+                    <% end %>
                   </li>
                 </ul>
               </div>
-            </div>
+            </div>  
           </div>
-          <%= yield %>
-        </div>
-        
+
+          <div class="main-content">
+            <div class="navbar navbar-expand-lg fixed-top" id="nav-header">
+              <div class="container-fluid">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                  <ul class="navbar-nav ms-auto mb-2 mb-lg-0"> 
+                    <li class="nav-item dropdown">
+                      <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 18px;">
+                        <%= current_user.first_name %> <%= current_user.last_name %>
+                      </a>
+                      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown"> 
+                        <li>
+                          <%= link_to "Profile", edit_user_path(current_user), class: "dropdown-item nav-link" %>
+                        </li>
+                        <li>
+                          <%= button_to "Log Out", destroy_user_session_path, method: :delete, class: "dropdown-item nav-link" %>
+                        </li>
+                      </ul>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <%= yield %>
+          </div>
       </div>
     <% else %>
       <div class="unauthenticated">
