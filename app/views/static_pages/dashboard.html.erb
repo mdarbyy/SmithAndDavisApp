@@ -201,10 +201,14 @@
 				salesPersonIdToName[sp.id] = name;
 			});
 
+      console.log("SalesPersonIdToName: ", salesPersonIdToName);
+
       const itemIdToName = {};
 			Items.forEach(item => {
 				itemIdToName[item.id] = item.name;
 			});
+
+      console.log("ItemIdToName: ", itemIdToName);
 
 			const totalsByPerson = {};
       salesRecords.forEach(record => {
@@ -219,7 +223,7 @@
       });
 
 			const allSortedData = Object.entries(totalsByPerson).sort((a, b) => a[0].localeCompare(b[0]));
-			console.log(allSortedData);
+			console.log("All Sorted Data: ", allSortedData);
 
 			const groupedSales = {};
 			salesRecords.forEach(record => {
@@ -249,6 +253,15 @@
         return a.name.localeCompare(b.name); // sort by name (ascending)
       });
 
+      console.log("Grouped Sales Array: ", groupedSalesArray);
+
+      const nameToSalesPersonId = {};
+      Object.entries(salesPersonIdToName).forEach(([id, name]) => {
+        nameToSalesPersonId[name] = parseInt(id);
+      });
+
+      console.log("Name To Sales Person Id: ", nameToSalesPersonId);
+
 			function populateItemSelect(){
 				const select = $('#item-filter');
 				select.find('option').remove();
@@ -272,9 +285,10 @@
 				let select = $('#sales-person-filter');
 				select.find('option').remove();
 
-				const optionsHtml = uniqueNames.map(name => 
-					new Option(name, name, true, true).outerHTML
-				).join('');
+				const optionsHtml = uniqueNames.map(name => {
+          const id = nameToSalesPersonId[name];
+          return new Option(name, id, true, true).outerHTML;
+        }).join('');
 
 				select.html(optionsHtml);
 				select.selectpicker('destroy');
@@ -283,7 +297,7 @@
 
 			function renderSalesBreakdownTable(){
 				const selectedItemIds = $('#item-filter').val();
-        const selectedSalesPeople = $('#sales-person-filter').val();
+        const selectedSalesPeopleIds = $('#sales-person-filter').val();
         
 				const tableBody = $('#salesBreakdownTableBody');
   			tableBody.empty();
@@ -296,7 +310,7 @@
 
 				filteredItems = filteredItems.map(item => {
           const filteredRecords = item.records.filter(record =>
-            selectedSalesPeople.includes(record.sales_person_name)
+            selectedSalesPeopleIds.includes(record.sales_person_id.toString())
           );
           return {
             ...item,
@@ -316,13 +330,17 @@
 			}
 			
 			function renderTotalSalesChart() {
-				const selectedNames = $('#sales-person-filter').val();
+				const selectedPeople = $('#sales-person-filter').val();
         const selectedItems = $('#item-filter').val();
+
         const selectedItemNames = selectedItems
         .map(id => itemIdToName[id.toString()])
-        .filter(name => !!name);	
+        .filter(name => !!name);
+        
+        const selectedPeopleNames = selectedPeople
+        .map(id => salesPersonIdToName[id.toString()]);
 
-				const filteredData = selectedNames.map(name => {
+				const filteredData = selectedPeopleNames.map(name => {
           const itemTotals = totalsByPerson[name] || {};
           const total = Object.entries(itemTotals)
             .filter(([itemName]) => selectedItemNames.includes(itemName))
@@ -335,10 +353,8 @@
 					nameToSalesPersonId[name] = parseInt(id);
 				});
 
-				const selectedIds = selectedNames.map(name => nameToSalesPersonId[name]);
-				// Count how many sales_records match those sales_person_ids
 				const filteredSales = salesRecords.filter(record =>
-          selectedIds.includes(record.sales_person_id) &&
+          selectedPeople.includes(record.sales_person_id.toString()) &&
           selectedItems.includes(record.item_id.toString())
         );
 
