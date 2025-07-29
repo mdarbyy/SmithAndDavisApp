@@ -117,7 +117,7 @@
 
         <div class="row">
           <div class="col">
-            <div class="card p-4 dashboard-card">
+            <div class="card p-4 dashboard-card" id="filterCard">
               <h5 class="mb-2 text-center">Filters</h5>
 
               <div class="row mb-3">
@@ -187,7 +187,31 @@
 <% if @start_date.present? and @end_date.present? %>
 	<script>
 		$(document).ready(function() {
-			const salesRecords = <%= raw @sales_records.to_json %>;
+			
+      function updateFilterSection() {
+        const card = document.getElementById("filterCard");
+        const selects = document.querySelectorAll('.filter-select');
+        const screenHeight = window.innerHeight;
+
+        selects.forEach(select => {
+          if (screenHeight <= 594) {
+            select.setAttribute('data-dropup-auto', 'false');
+            select.classList.add('dropup');
+            card.classList.add('pb-3');
+          } else {
+            select.removeAttribute('data-dropup-auto');
+            select.classList.remove('dropup');
+            card.classList.remove('pb-3');
+          }
+        });
+      }
+      
+      document.addEventListener('DOMContentLoaded', updateFilterSection);
+      window.addEventListener('resize', updateFilterSection);
+
+      updateFilterSection();
+      
+      const salesRecords = <%= raw @sales_records.to_json %>;
 			const salesPeople = <%= raw @sales_people.to_json %>;
 			const Items = <%= raw @items.to_json %>;
 
