@@ -199,8 +199,9 @@
             select.classList.add('dropup');
             card.classList.add('pb-3');
           } else {
-            select.removeAttribute('data-dropup-auto');
+            select.setAttribute('data-dropup-auto', 'false');
             select.classList.remove('dropup');
+            select.classList.add('dropdown');
             card.classList.remove('pb-3');
           }
         });
@@ -480,7 +481,10 @@
 					}],
 					exporting: {
 						enabled: true
-					}
+					},
+          credits: {
+            enabled: false
+          }
 				});
     	}
 
