@@ -68,7 +68,13 @@
     </div>
 
     <div style="text-align: center;" id="recordCount">
-      <b>Displaying <span id="currentCount">0</span> of <span id="totalCount"><%= @total_records %></span> Sales Records</b>
+      <b>
+        Displaying <span id="currentCount"></span> 
+        <span id="recordLabel"
+          data-singular="Sales Record"
+          data-plural="Sales Records">
+        </span>
+      </b>
     </div>
   </div>
 </div>
