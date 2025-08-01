@@ -23,7 +23,6 @@
             <tr>
               <th class="stick" scope="col"><a>Name</a></th>
               <th class="stick" scope="col"><a></a></th>
-              <th class="stick" scope="col"><a></a></th>
             </tr>
           </thead>
           <tbody id="content-table-body">
@@ -37,7 +36,6 @@
           <thead>
             <tr>
               <th class="stick" scope="col"><a>Name</a></th>
-              <th class="stick" scope="col"><a></a></th>
               <th class="stick" scope="col"><a></a></th>
             </tr>
           </thead>
@@ -54,13 +52,20 @@
     </div>
 
     <div style="text-align: center;" id="recordCount">
-      <b>Displaying <span id="currentCount">0</span> of <span id="totalCount"><%= @total_records %></span> Sales People</b>
+      <b>
+        Displaying <span id="currentCount"></span> 
+        <span id="recordLabel"
+          data-singular="Sales Person"
+          data-plural="Sales People">
+        </span>
+      </b>
     </div>
   </div>
 </div>
 
 <script>
-  var isLoading = false;
+  
+  /*var isLoading = false;
 
   $("#content-scroll").scroll(function() {
     var totalRecords = parseInt($('#totalCount').text());
@@ -70,7 +75,7 @@
         loadMoreRecords();
       }
     }
-  });
+  });*/
 
   function loadMoreRecords() {
     if (isLoading) return;

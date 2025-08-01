@@ -3,10 +3,12 @@ class ItemsController < ApplicationController
 
   # GET /items or /items.json
   def index
-    @limit = Setting.first.entity_limit
-    offset = params[:offset].to_i || 0
-    @items = Item.all.includes(:sales_records).limit(@limit).offset(offset).order(name: :asc)
-    @total_records = Item.all.count
+    #@limit = Setting.first.entity_limit
+    #offset = params[:offset].to_i || 0
+    #@items = Item.all.includes(:sales_records).limit(@limit).offset(offset).order(name: :asc)
+    #@total_records = Item.all.count
+
+    @items = Item.all.includes(:sales_records).order(name: :asc)
 
     respond_to do |format|
       format.html

@@ -54,14 +54,20 @@
     </div>
 
     <div style="text-align: center;" id="recordCount">
-      <b>Displaying <span id="currentCount">0</span> of <span id="totalCount"><%= @total_records %></span>
-      Users</b>
+      <b>
+        Displaying <span id="currentCount"></span>
+        <span id="recordLabel"
+          data-singular="User"
+          data-plural="Users">
+        </span>
+      </b>
     </div>
   </div>
 </div>
 
 <script>
-  var offset1 = <%= Setting.first.entity_limit %>;
+  
+  /*var offset1 = <%= Setting.first.entity_limit %>;
   var isLoading = false;
 
   $("#content-scroll").scroll(function() {
@@ -73,7 +79,7 @@
         loadMoreRecords();
       }
     }
-  });
+  });*/
 
   function loadMoreRecords() {
     if (isLoading) return;

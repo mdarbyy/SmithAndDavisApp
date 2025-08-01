@@ -52,14 +52,21 @@
     </div>
 
     <div style="text-align: center;" id="recordCount">
-      <b>Displaying <span id="currentCount">0</span> of <span id="totalCount"><%= @total_records %></span> Items</b>
+      <%# <b>Displaying <span id="currentCount"></span><span id="totalCount"></span> Items</b>%>
+      <b>
+        Displaying <span id="currentCount"></span> 
+        <span id="recordLabel"
+          data-singular="Item"
+          data-plural="Items">
+        </span>
+      </b>
     </div>
   </div>
 </div>
 
 <script>
-  var isLoading = false;
-
+  
+  /*var isLoading = false;
   $("#content-scroll").scroll(function() {
     var totalRecords = parseInt($('#totalCount').text());
     var currentCount = parseInt($('#currentCount').text());
@@ -68,7 +75,7 @@
         loadMoreRecords();
       }
     }
-  });
+  });*/
 
   function loadMoreRecords() {
     if (isLoading) return;

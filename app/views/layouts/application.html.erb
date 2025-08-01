@@ -567,6 +567,7 @@
 
     var rowCount = $('#content-table tbody tr').length;
     $('#currentCount').text(rowCount);
+    updateRecordLabel(rowCount);
 
     $("#content-search").on("keyup", function() {
       var value = $(this).val().toLowerCase();
@@ -575,6 +576,7 @@
       });
       var visibleCount = $("#content-table-body tr:visible").length;
       $('#currentCount').text(visibleCount);
+      updateRecordLabel(visibleCount);
     });
  
   });
@@ -649,6 +651,14 @@
   function show_spinner(){
     document.getElementById("overlay").style.display = "block";
     $('#spinner').show();
+  }
+
+  function updateRecordLabel(count) {
+    $('#currentCount').text(count);
+    const label = $('#recordLabel');
+    const singular = label.data('singular');
+    const plural = label.data('plural');
+    label.text(count === 1 ? singular : plural);
   }
 
   var currentAlertIds = {

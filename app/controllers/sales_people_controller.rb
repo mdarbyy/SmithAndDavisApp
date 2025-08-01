@@ -3,10 +3,12 @@ class SalesPeopleController < ApplicationController
 
   # GET /sales_people or /sales_people.json
   def index
-    @limit = Setting.first.entity_limit
-    offset = params[:offset].to_i || 0
-    @sales_people = SalesPerson.all.includes(:sales_records).limit(@limit).offset(offset).order(first_name: :asc, last_name: :asc)
-    @total_records = SalesPerson.all.count
+    #@limit = Setting.first.entity_limit
+    #offset = params[:offset].to_i || 0
+    #@sales_people = SalesPerson.all.includes(:sales_records).limit(@limit).offset(offset).order(first_name: :asc, last_name: :asc)
+    #@total_records = SalesPerson.all.count
+
+    @sales_people = SalesPerson.all.includes(:sales_records).order(first_name: :asc, last_name: :asc)
 
     respond_to do |format|
       format.html

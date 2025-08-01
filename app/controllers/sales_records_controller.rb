@@ -28,6 +28,7 @@ class SalesRecordsController < ApplicationController
 
   # GET /sales_records/1/edit
   def edit
+    session[:return_to] = request.referer
   end
 
   # POST /sales_records or /sales_records.json
@@ -44,13 +45,12 @@ class SalesRecordsController < ApplicationController
 
   # PATCH/PUT /sales_records/1 or /sales_records/1.json
   def update
-    
     if params[:sales_record][:sell_date].present?
       params[:sales_record][:sell_date] = Date.strptime(params[:sales_record][:sell_date], '%m/%d/%Y')
     end
     
     if @sales_record.update(sales_record_params)
-      redirect_to sales_records_path, success: 'Sales Record was updated'
+      redirect_to(session.delete(:return_to) || sales_records_path, success: 'Sales Record was updated')
     else
       flash.now[:danger] = @sales_record.errors.full_messages.first
       render :edit, status: :unprocessable_entity
