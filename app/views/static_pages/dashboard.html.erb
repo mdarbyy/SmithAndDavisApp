@@ -36,7 +36,7 @@
 					<h5 class="modal-title" id="totalSalesModalLabel"><b><span id="salesPersonName"></span></b> (<span id="salesPersonRecordCount"></span>)</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
-				<div class="modal-body custom-modal">
+				<div class="modal-body">
 					<div class="scrollable-table">
 						<table class="table content" id="totalSalesModalTable">
 							<thead>
@@ -194,7 +194,7 @@
         const screenHeight = window.innerHeight;
 
         selects.forEach(select => {
-          if (screenHeight <= 594) {
+          if (screenHeight <= 900){
             select.setAttribute('data-dropup-auto', 'false');
             select.classList.add('dropup');
             card.classList.add('pb-3');
@@ -211,6 +211,8 @@
       window.addEventListener('resize', updateFilterSection);
 
       updateFilterSection();
+
+      console.log("Height: " + window.innerHeight);
       
       const salesRecords = <%= raw @sales_records.to_json %>;
 			const salesPeople = <%= raw @sales_people.to_json %>;

@@ -34,6 +34,7 @@ class UsersController < ApplicationController
   end
 
   def edit
+    session[:return_to] = request.referer
   end
 
   def update
@@ -46,7 +47,7 @@ class UsersController < ApplicationController
         bypass_sign_in(current_user)
       end
       
-      redirect_to users_path, success: 'User was updated'
+      redirect_to(session.delete(:return_to) || users_path, success: 'User was updated')
     else
       flash.now[:danger] = @user.errors.full_messages.first
       render :edit, status: :unprocessable_entity
