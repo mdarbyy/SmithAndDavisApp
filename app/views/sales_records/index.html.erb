@@ -15,7 +15,7 @@
   </div>
   
   <div class="card m-1 p-2" id="content-main">
-    <div id="content-scroll">
+    <div class="scrollable-table">
       <% if @sales_records.present? and @sales_records.count > 0 %>
         <table class="table content" id="content-table">
           <thead>
@@ -64,12 +64,12 @@
 
 <script>
   var isLoading = false;
-  $("#content-scroll").scroll(function() {
+  $(".scrollable-table").scroll(function() {
     var totalRecords = parseInt($('#totalCount').text());
     var currentCount = parseInt($('#currentCount').text());
 
     if (currentCount < totalRecords) {
-      if ($("#content-scroll").scrollTop() >= $("#content-table").height() - $("#content-scroll").height() && !isLoading) {
+      if ($(".scrollable-table").scrollTop() >= $("#content-table").height() - $(".scrollable-table").height() && !isLoading) {
         loadMoreRecords();
       }
     }
