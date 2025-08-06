@@ -41,7 +41,7 @@
 
 	<div class="row">
     <div class="col-12 d-flex justify-content-end">
-      <%= form.submit 'Submit', class: 'btn btn-main', onclick:"show_spinner()" %>
+      <%= form.submit 'Submit', class: 'btn btn-main', data: { turbo: false }, onclick:"show_spinner()" %>
     </div>
   </div>
 

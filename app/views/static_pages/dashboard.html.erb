@@ -1,6 +1,6 @@
 <% if @start_date.blank? || @end_date.blank? %>
   <div class="d-flex justify-content-center align-items-center" style="min-height: 60vh;">
-    <div class="card p-4 dashboard-card" style="max-width: 450px; width: 100%;">
+    <div class="card p-4 custom-shadow" style="max-width: 450px; width: 100%;">
       <h4 class="mb-3 text-center">Select a Date Range</h4>
       <%= form_with url: dashboard_path, method: :get, local: true do |form| %>
         <div class="mb-3">
@@ -22,7 +22,7 @@
           </div>
         </div>
         <div class="d-flex justify-content-end">
-          <%= form.submit "View Dashboard", class: "btn btn-main", onclick:"show_spinner()" %>
+          <%= form.submit "View Dashboard", class: "btn btn-main", data: { turbo: false }, onclick:"show_spinner()" %>
         </div>
       <% end %>
     </div>
@@ -55,16 +55,16 @@
 		</div>
 	</div>
 
-	<div class="modal fade" id="salesBreakdownModal" tabindex="-1" aria-labelledby="salesBreakdownModalLabel" aria-hidden="true">
+	<div class="modal fade" id="itemBreakdownModal" tabindex="-1" aria-labelledby="itemBreakdownModalLabel" aria-hidden="true">
 		<div class="modal-dialog custom-modal">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h5 class="modal-title" id="salesBreakdownModalLabel"><b><span id="itemName"></b></span> (<span id="itemCount"></span>)</h5>
+					<h5 class="modal-title" id="itemBreakdownModalLabel"><b><span id="itemName"></b></span> (<span id="itemCount"></span>)</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
 				<div class="modal-body custom-modal">
-					<div class="scrollable-table show-scrollbar">
-						<table class="table content" id="salesBreakdownModalTable">
+					<div class="scrollable-table">
+						<table class="table content" id="itemBreakdownModalTable">
 							<thead>
 								<tr>
 									<th class="stick" scope="col">Sales Person</th>
@@ -72,7 +72,7 @@
 									<th class="stick" scope="col">Price</th>
 								</tr>
 							</thead>
-							<tbody id="salesBreakdownModalTableBody">
+							<tbody id="itemBreakdownModalTableBody">
 							</tbody>
 						</table>
 					</div>
@@ -86,7 +86,7 @@
 			<div class="col-12 col-md-3">
 				<div class="row mb-4">
           <div class="col">
-            <div class="card p-4 dashboard-card">
+            <div class="card p-4 custom-shadow">
               <h5 class="mb-3 text-center">Change the Date Range</h5>
               <%= form_with url: dashboard_path, method: :get, local: true do |form| %>
                 <div class="mb-3">
@@ -108,7 +108,7 @@
                   </div>
                 </div>
                 <div class="d-flex justify-content-end">
-                  <%= form.submit "Submit", class: "btn btn-main", onclick:"show_spinner()" %>
+                  <%= form.submit "Submit", class: "btn btn-main", data: { turbo: false }, onclick:"show_spinner()" %>
                 </div>
               <% end %>
             </div>
@@ -117,7 +117,7 @@
 
         <div class="row">
           <div class="col">
-            <div class="card p-4 dashboard-card" id="filterCard">
+            <div class="card p-4 custom-shadow" id="filterCard">
               <h5 class="mb-2 text-center">Filters</h5>
 
               <div class="row mb-3">
@@ -138,19 +138,19 @@
 
 			<div class="col-12 col-md-9">
 				<ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
-					<li class="nav-item dashboard-card" role="presentation">
+					<li class="nav-item custom-shadow" role="presentation">
 						<a class="nav-link active" id="total-sales-tab" data-bs-toggle="tab" href="#total-sales" role="tab" aria-controls="total-sales" aria-selected="true">
 							Total Sales
 						</a>
 					</li>
-					<li class="nav-item dashboard-card" role="presentation">
-						<a class="nav-link" id="sales-breakdown-tab" data-bs-toggle="tab" href="#sales-breakdown" role="tab" aria-controls="sales-breakdown" aria-selected="true">
-							Sales Breakdown
+					<li class="nav-item custom-shadow" role="presentation">
+						<a class="nav-link" id="item-breakdown-tab" data-bs-toggle="tab" href="#item-breakdown" role="tab" aria-controls="item-breakdown" aria-selected="true">
+							Item Breakdown
 						</a>
 					</li>
 				</ul>
 
-				<div class="card border-top-0 rounded-bottom dashboard-card">
+				<div class="card border-top-0 rounded-bottom custom-shadow">
 					<div class="card-body tab-content" id="dashboardTabsContent">
 						<div class="tab-pane fade show active" id="total-sales" role="tabpanel" aria-labelledby="total-sales-tab">
 							<div class="row">
@@ -159,18 +159,18 @@
 								</div>
 							</div>
 						</div>
-						<div class="tab-pane fade show" id="sales-breakdown" role="tabpanel" aria-labelledby="sales-breakdown-tab">
+						<div class="tab-pane fade show" id="item-breakdown" role="tabpanel" aria-labelledby="item-breakdown-tab">
 							<div class="row">
 								<div class="col">
 									<div class="scrollable-table dashboard-content">
-										<table class="table content" id="salesBreakdownTable">
+										<table class="table content" id="itemBreakdownTable">
 											<thead>
 												<tr>
 													<th class="stick" scope="col">Item</th>
 													<th class="stick" scope="col">Amount Sold</th>
 												</tr>
 											</thead>
-											<tbody id="salesBreakdownTableBody">
+											<tbody id="itemBreakdownTableBody">
 											</tbody>
 										</table>
 									</div>
@@ -194,15 +194,14 @@
         const screenHeight = window.innerHeight;
 
         selects.forEach(select => {
+          select.setAttribute('data-dropup-auto', 'false');
           if (screenHeight <= 900){
-            select.setAttribute('data-dropup-auto', 'false');
             select.classList.add('dropup');
-            card.classList.add('pb-4');
+            card.classList.add('filter-card-height');
           } else {
-            select.setAttribute('data-dropup-auto', 'false');
             select.classList.remove('dropup');
             select.classList.add('dropdown');
-            card.classList.remove('pb-4');
+            card.classList.remove('filter-card-height');
           }
         });
       }
@@ -322,11 +321,11 @@
 				select.selectpicker();
 			}
 
-			function renderSalesBreakdownTable(){
+			function renderItemBreakdownTable(){
 				const selectedItemIds = $('#item-filter').val();
         const selectedSalesPeopleIds = $('#sales-person-filter').val();
         
-				const tableBody = $('#salesBreakdownTableBody');
+				const tableBody = $('#itemBreakdownTableBody');
   			tableBody.empty();
 				if (!selectedItemIds || selectedItemIds.length === 0) return;
 
@@ -575,16 +574,16 @@
 			populateSalesPersonSelect();
       populateItemSelect();
 			renderTotalSalesChart();
-			renderSalesBreakdownTable();
+			renderItemBreakdownTable();
 
 			$('#item-filter').on('changed.bs.select', function () {
 				renderTotalSalesChart();
-        renderSalesBreakdownTable();
+        renderItemBreakdownTable();
 			});
 
 			$('#sales-person-filter').on('changed.bs.select', function () {
   			renderTotalSalesChart();
-        renderSalesBreakdownTable();
+        renderItemBreakdownTable();
 			});
 
 			$(document).on('click', '.clickable-item', function (e) {
@@ -621,11 +620,8 @@
 					`;
 				}).join('');
 
-				// Inject the rows into the modal table
-				$('#salesBreakdownModalTableBody').html(rowsHtml);
-
-				// Show the modal (jQuery-based Bootstrap call)
-				$('#salesBreakdownModal').modal('show');
+				$('#itemBreakdownModalTableBody').html(rowsHtml);
+				$('#itemBreakdownModal').modal('show');
 			});
 
 		});

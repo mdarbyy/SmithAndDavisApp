@@ -8,12 +8,12 @@
     <%= f.password_field :password, class: 'form-control' %>
   </div>
   <div class="d-grid gap-2">
-    <%= f.submit "Sign in", class: "btn btn-main" %>
+    <%= f.submit "Sign in", data: { turbo: false }, class: "btn btn-main" %>
   </div>
- 
+
   <% unless User.exists? %>
     <div class="text-center mt-3">
-      Dont have an account? <%= link_to "Sign up", new_registration_path(resource_name), class: "link-primary", style:"color: #193856 !important" %> 
+      Dont have an account? <%= link_to "Sign up", new_registration_path(resource_name), class: "link-primary", style:"color: var(--main-color) !important" %> 
     </div>
   <% end %>
 <% end %>

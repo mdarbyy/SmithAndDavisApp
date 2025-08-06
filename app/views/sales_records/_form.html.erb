@@ -59,7 +59,7 @@
   <!-- Submit Button -->
   <div class="row" id="submit-btn-row" style="display: none;">
     <div class="col-12 d-flex justify-content-end">
-      <%= submit_tag 'Submit', class: 'btn btn-main', id: 'submit_button', onclick:"show_spinner()" %>
+      <%= submit_tag 'Submit', class: 'btn btn-main', id: 'submit_button', onclick:"show_spinner()", data: { turbo: false } %>
     </div>
   </div>
 

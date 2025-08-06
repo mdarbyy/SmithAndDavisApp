@@ -262,7 +262,7 @@
         max-height: 90vh;
       }
 
-      .dashboard-card {
+      .custom-shadow {
         box-shadow: 0 .5rem .5rem rgba(0, 0, 0, 0.10) !important;
       }
 
@@ -291,6 +291,10 @@
 
       .dropdown-item.nav-link:focus-visible {
         outline: none; /* Ensure links don't turn blue when focused */
+      }
+
+      .filter-card-height {
+        height: calc(54vh - 157px);
       }
 
       .form-container {
@@ -384,7 +388,7 @@
       }
 
       .scrollable-form::-webkit-scrollbar, #content-scroll::-webkit-scrollbar {
-        display: none; /* For Chrome, Safari, and Edge */
+        display: none;
       }
 
       .search-form {
@@ -424,20 +428,6 @@
       .show-scrollbar {
         overflow-y: auto;
         scrollbar-width: auto;              
-        scrollbar-color: var(--main-color) transparent;
-      }
-
-      .show-scrollbar::-webkit-scrollbar {
-        width: 8px;
-      }
-
-      .show-scrollbar::-webkit-scrollbar-thumb {
-        background-color: var(--main-color);;
-        border-radius: 4px;
-      }
-
-      .show-scrollbar::-webkit-scrollbar-track {
-        background-color: transparent;
       }
 
       .unauthenticated {
@@ -507,9 +497,9 @@
                   </li>
                   <li class="list-group-item text-center">
                     <% if Setting.exists? %>
-                      <%= link_to "Settings", edit_setting_path(Setting.first), class: "dashboard-link sidebar-nav-link #{'active' if current_page?(edit_setting_path(Setting.first))}" %>
+                      <% link_to "Settings", edit_setting_path(Setting.first), class: "dashboard-link sidebar-nav-link #{'active' if current_page?(edit_setting_path(Setting.first))}" %>
                     <% else %>
-                      <%= link_to "Settings", settings_path, class: "dashboard-link sidebar-nav-link #{'active' if current_page?(settings_path)}" %>
+                      <% link_to "Settings", settings_path, class: "dashboard-link sidebar-nav-link #{'active' if current_page?(settings_path)}" %>
                     <% end %>
                   </li>
                 </ul>
