@@ -4,7 +4,11 @@
   <td>
     <% if sales_person.sales_records.present? %>
       <%= button_to 'View Sales Records', sales_person_path(sales_person), method: :get, data: {turbo: false}, class: 'btn btn-main', style:"margin-top: 0;" %>
-    <% else %>
+    <% end %>
+  </td>
+  
+  <td>
+    <% unless sales_person.sales_records.present? %>
       <button class="btn btn-delete" type="button"
         data-entity="sales_people"
         data-entity-name="Sales Person"
