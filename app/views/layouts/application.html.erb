@@ -268,7 +268,7 @@
         height: calc(100vh - 70px);
       }
 
-      .datepicker table tr td.active, .datepicker table tr td.active:hover{
+      .datepicker table tr td.active, .datepicker table tr td.active:hover, .datepicker table tr td span.active, .datepicker table tr td span.active:hover, .bootstrap-select .dropdown-menu li a:active {
         background-image: none;
         background-color: #193856 !important;
       }
@@ -412,6 +412,26 @@
         margin-top: 20px;
         margin-bottom: 20px;
         border-radius: 1px;
+      }
+
+      .show-scrollbar {
+        overflow-y: auto;
+        scrollbar-width: auto;              
+        scrollbar-color: #193856 transparent;   /* thumb color | track color (Firefox) */
+      }
+
+      /* WebKit-based browsers (Chrome, Edge, Safari) */
+      .show-scrollbar::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      .show-scrollbar::-webkit-scrollbar-thumb {
+        background-color: #193856;
+        border-radius: 4px;
+      }
+
+      .show-scrollbar::-webkit-scrollbar-track {
+        background-color: transparent;
       }
 
       .unauthenticated {

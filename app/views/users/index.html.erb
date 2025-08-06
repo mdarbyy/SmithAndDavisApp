@@ -15,8 +15,7 @@
   </div>
   
   <div class="card m-1 p-2" id="content-main">
-    <div id="content-scroll">
-
+    <div class="scrollable-table">
       <% if @users.present? and @users.count > 0 %>
         <table class="table content" id="content-table">
           <thead>
@@ -66,21 +65,6 @@
 </div>
 
 <script>
-  
-  /*var offset1 = <%= Setting.first.entity_limit %>;
-  var isLoading = false;
-
-  $("#content-scroll").scroll(function() {
-    var totalRecords = parseInt($('#totalCount').text());
-    var currentCount = parseInt($('#currentCount').text());
-
-    if (currentCount < totalRecords) {
-      if ($("#content-scroll").scrollTop() >= $("#content-table").height() - $("#content-scroll").height() && !isLoading) {
-        loadMoreRecords();
-      }
-    }
-  });*/
-
   function loadMoreRecords() {
     if (isLoading) return;
     console.log("Loading Users");
