@@ -78,6 +78,13 @@
     <%= javascript_importmap_tags %>
 
     <style>
+      :root {
+        --main-color: #193856;
+        --hover-color: #052748;
+        --delete-color: #a8504b;
+        --delete-hover-color: #964642;
+      }
+
       html, body {
         height: 100%;
         width: 100%;
@@ -118,7 +125,7 @@
 
       #content-main {
         height: calc(100vh - 70px - 75px);
-        overflow: hidden; /* hide overflow, keep height fixed */
+        overflow: hidden;
         display: flex;
         flex-direction: column;
       }
@@ -130,7 +137,7 @@
       }
 
       #nav-sidebar {
-        background-color: #193856; 
+        background-color: var(--main-color); 
         color: white; 
         height: 100vh; 
         left: 0;
@@ -143,7 +150,7 @@
       }
 
       #nav-sidebar .list-group-item {
-        background-color: #193856; 
+        background-color: var(--main-color); 
         border: none;
         padding: 0;
       }  
@@ -157,7 +164,7 @@
       }
 
       #nav-sidebar .sidebar-nav-link:hover, .sidebar-nav-link.active {
-        background-color: #052748;
+        background-color: var(--hover-color);
         color: white !important;
       }
 
@@ -181,7 +188,7 @@
         z-index: 9999; 
         width: 100px; 
         height: 100px;
-        color: #193856;
+        color: var(--main-color);
       }
 
       .authenticated {
@@ -214,26 +221,26 @@
       }
 
       .btn-delete {
-        background-color: #a8504b;
+        background-color: var(--delete-color);
         color: white !important;
       }
 
       .btn-delete:hover,
       .btn-delete:focus,
       .btn-delete:active{
-        background-color: #964642 !important;
+        background-color: var(--delete-hover-color) !important;
         color: white !important;
       }
 
       .btn-main {
-        background-color: #193856 !important;
+        background-color: var(--main-color); !important;
         color: white !important;
       }
 
       .btn-main:hover,
       .btn-main:focus,
       .btn-main:active{
-        background-color: #052748 !important;
+        background-color: var(--hover-color); !important;
         color: white !important;
       }
 
@@ -270,7 +277,7 @@
 
       .datepicker table tr td.active, .datepicker table tr td.active:hover, .datepicker table tr td span.active, .datepicker table tr td span.active:hover, .bootstrap-select .dropdown-menu li a:active {
         background-image: none;
-        background-color: #193856 !important;
+        background-color: var(--main-color) !important;
       }
 
       .dropdown-item.nav-link:focus,
@@ -355,11 +362,11 @@
       }
 
       .nav-link, .nav-link:visited {
-        color: #193856;
+        color: var(--main-color);
       }
 
       .nav-link:hover {
-        color: #052748;
+        color: var(--hover-color);
       }
 
       /* goes with .custom-modal */
@@ -388,7 +395,7 @@
       }
 
       .select2-container--default .select2-results__option--highlighted[aria-selected] {
-        background-color: #193856 !important;
+        background-color: var(--main-color); !important;
         color: white !important;
       }
 
@@ -417,16 +424,15 @@
       .show-scrollbar {
         overflow-y: auto;
         scrollbar-width: auto;              
-        scrollbar-color: #193856 transparent;   /* thumb color | track color (Firefox) */
+        scrollbar-color: var(--main-color) transparent;
       }
 
-      /* WebKit-based browsers (Chrome, Edge, Safari) */
       .show-scrollbar::-webkit-scrollbar {
         width: 8px;
       }
 
       .show-scrollbar::-webkit-scrollbar-thumb {
-        background-color: #193856;
+        background-color: var(--main-color);;
         border-radius: 4px;
       }
 
