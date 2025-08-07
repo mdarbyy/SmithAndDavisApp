@@ -636,12 +636,11 @@
         const row = button.closest("tr");
         if (row) row.remove();
 
-        const countElement = document.getElementById("currentCount");
-        if (countElement) {
-          let newCount = parseInt(countElement.innerText) - 1;
-          countElement.innerText = newCount >= 0 ? newCount : 0;
-        }
+        var rowCount = $('#content-table tbody tr').length;
+        $('#currentCount').text(rowCount);
+        updateRecordLabel(rowCount);
 
+        //for the sales records index page
         const totalElement = document.getElementById("totalCount");
         if (totalElement) {
           let newCount = parseInt(totalElement.innerText) - 1;
