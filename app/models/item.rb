@@ -7,7 +7,7 @@ class Item < ApplicationRecord
   private
 
   def unique_item
-    if Item.where("LOWER(name) LIKE ?", "%#{name.downcase}%").exists?
+    if Item.where("LOWER(name) = ?", name.downcase).exists?
       errors.add(:base, "This Item already exists")
       throw(:abort)
     end
