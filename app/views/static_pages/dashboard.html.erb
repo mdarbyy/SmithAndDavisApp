@@ -194,11 +194,12 @@
         const screenHeight = window.innerHeight;
 
         selects.forEach(select => {
-          const wrapper = select.closest('.bootstrap-select');
+          select.setAttribute('data-dropup-auto', 'false');
+          const wrapper = $(select).closest('.bootstrap-select');
 
           // Save desired direction into dataset for later
           if (screenHeight <= 900) {
-            select.dataset.forceDirection = 'up';
+            select.classList.add('dropup');
             if (screenHeight < 600) {
               card.classList.add('pb-3');
               card.classList.remove('pb-4');
@@ -207,27 +208,19 @@
               card.classList.remove('pb-3');
             }
           } else {
+            select.classList.remove('dropup');
             select.dataset.forceDirection = 'down';
             card.classList.remove('pb-3', 'pb-4');
           }
         });
       }
 
-      // Force direction on open
       $(document).on('show.bs.select', '.filter-select', function () {
         const wrapper = $(this).closest('.bootstrap-select');
         const direction = this.dataset.forceDirection;
-        
-        if (direction === 'up') {
-          wrapper.removeClass('dropdown').addClass('dropup');
-        } else {
+        if(direction === 'down'){
           wrapper.removeClass('dropup').addClass('dropdown');
         }
-      });
-
-      document.addEventListener('DOMContentLoaded', () => {
-        $('.filter-select').selectpicker({ dropupAuto: false });
-        updateFilterSection();
       });
 
       window.addEventListener('resize', updateFilterSection);
