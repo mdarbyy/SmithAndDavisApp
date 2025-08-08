@@ -197,11 +197,16 @@
           select.setAttribute('data-dropup-auto', 'false');
           if (screenHeight <= 900){
             select.classList.add('dropup');
-            card.classList.add('filter-card-height');
+            if(screenHeight < 600){
+              card.classList.add('pb-3');
+            } else {
+              card.classList.add('pb-4');
+            }
           } else {
             select.classList.remove('dropup');
             select.classList.add('dropdown');
-            card.classList.remove('filter-card-height');
+            card.classList.remove('pb-3');
+            card.classList.remove('pb-4');
           }
         });
       }
