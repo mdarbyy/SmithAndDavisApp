@@ -194,24 +194,42 @@
         const screenHeight = window.innerHeight;
 
         selects.forEach(select => {
-          select.setAttribute('data-dropup-auto', 'false');
-          if (screenHeight <= 900){
-            select.classList.add('dropup');
-            if(screenHeight < 600){
+          const wrapper = select.closest('.bootstrap-select');
+
+          // Save desired direction into dataset for later
+          if (screenHeight <= 900) {
+            select.dataset.forceDirection = 'up';
+            if (screenHeight < 600) {
               card.classList.add('pb-3');
+              card.classList.remove('pb-4');
             } else {
               card.classList.add('pb-4');
+              card.classList.remove('pb-3');
             }
           } else {
-            select.classList.remove('dropup');
-            select.classList.add('dropdown');
-            card.classList.remove('pb-3');
-            card.classList.remove('pb-4');
+            select.dataset.forceDirection = 'down';
+            card.classList.remove('pb-3', 'pb-4');
           }
         });
       }
-      
-      document.addEventListener('DOMContentLoaded', updateFilterSection);
+
+      // Force direction on open
+      $(document).on('show.bs.select', '.filter-select', function () {
+        const wrapper = $(this).closest('.bootstrap-select');
+        const direction = this.dataset.forceDirection;
+        
+        if (direction === 'up') {
+          wrapper.removeClass('dropdown').addClass('dropup');
+        } else {
+          wrapper.removeClass('dropup').addClass('dropdown');
+        }
+      });
+
+      document.addEventListener('DOMContentLoaded', () => {
+        $('.filter-select').selectpicker({ dropupAuto: false });
+        updateFilterSection();
+      });
+
       window.addEventListener('resize', updateFilterSection);
 
       updateFilterSection();
