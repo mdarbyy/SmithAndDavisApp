@@ -1,6 +1,5 @@
 Rails.application.routes.draw do
-  resources :items
-  
+
   devise_for :users, controllers: {
     sessions: 'users/sessions',
     registrations: 'users/registrations'
@@ -9,6 +8,7 @@ Rails.application.routes.draw do
   authenticated :user do
 
     resources :sales_records
+    resources :items
     resources :sales_people
     resources :settings
     resources :users
