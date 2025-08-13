@@ -62,7 +62,10 @@ class SalesPeopleController < ApplicationController
     @sales_person.destroy
     respond_to do |format|
       format.html { redirect_to sales_people_path, success: 'Sales Person was deleted' }
-      format.json { head :no_content }
+      format.json do
+        @sales_person.destroyed? ? head(:no_content) :
+        render(json: { errors: @sales_person.errors.full_messages }, status: :unprocessable_entity)
+      end
     end
   end
 

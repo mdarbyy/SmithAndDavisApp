@@ -233,14 +233,14 @@
       }
 
       .btn-main {
-        background-color: var(--main-color); !important;
+        background-color: var(--main-color) !important;
         color: white !important;
       }
 
       .btn-main:hover,
       .btn-main:focus,
       .btn-main:active{
-        background-color: var(--hover-color); !important;
+        background-color: var(--hover-color) !important;
         color: white !important;
       }
 
@@ -311,7 +311,7 @@
         align-items: center;
         background-color: white;
         display: flex;
-        flex-direction: column; /*stack vertically */
+        flex-direction: column;
         flex: 1;
         justify-content: center;
         padding: 20px;
@@ -327,13 +327,13 @@
       }
 
       input.form-control.datepicker {
-        height: 38px;               /* Match Bootstrap input height */
-        padding: 6px 12px;         /* Match Bootstrap input padding */
-        border: 1px solid #ced4da; /* Bootstrap border color */
-        border-radius: 4px;        /* Bootstrap border radius */
-        box-sizing: border-box;    /* Ensure padding doesn't increase total size */
-        font-size: 1rem;           /* Default font size */
-        line-height: 1.5;          /* Bootstrap line height */
+        height: 38px;               
+        padding: 6px 12px;         
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        box-sizing: border-box;
+        font-size: 1rem;
+        line-height: 1.5;
       }
 
       .list-group-item {
@@ -399,7 +399,7 @@
       }
 
       .select2-container--default .select2-results__option--highlighted[aria-selected] {
-        background-color: var(--main-color); !important;
+        background-color: var(--main-color) !important;
         color: white !important;
       }
 
@@ -450,7 +450,6 @@
           max-height: 75vh !important;
         }
       }
-
     </style>
   </head>
 
@@ -632,15 +631,20 @@
       }
     })
     .then(response => {
-      if (response.ok) {
+      if (response.status === 204 || response.headers.get("Content-Length") === "0") {
+        return { ok: response.ok, data: null };
+      }
+      return response.json().then(data => ({ ok: response.ok, data }));
+    })
+    .then(({ ok, data }) => {
+      if (ok) {
         const row = button.closest("tr");
         if (row) row.remove();
-
+        
         var rowCount = $('#content-table tbody tr').length;
         $('#currentCount').text(rowCount);
         updateRecordLabel(rowCount);
 
-        //for the sales records index page
         const totalElement = document.getElementById("totalCount");
         if (totalElement) {
           let newCount = parseInt(totalElement.innerText) - 1;
@@ -649,12 +653,12 @@
 
         alertMessage(`${entityName} was deleted`, "SUCCESS", 2500);
       } else {
-        alertMessage(`Failed to delete ${entityName}`, "DANGER", 2500);
+        const errorMsg = data.errors ? data.errors.join(", ") : `Failed to delete ${entityName}`;
+        alertMessage(errorMsg, "DANGER", 4000);
       }
     })
     .catch(error => {
       console.error(`Error deleting ${entityName}:`, error);
-      alertMessage("", "DANGER", 2500);
     });
   }
 

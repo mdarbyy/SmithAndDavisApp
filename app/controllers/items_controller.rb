@@ -56,7 +56,10 @@ class ItemsController < ApplicationController
     @item.destroy
     respond_to do |format|
       format.html { redirect_to items_path, success: 'Item was deleted' }
-      format.json { head :no_content }
+      format.json do
+        @item.destroyed? ? head(:no_content) :
+        render(json: { errors: @item.errors.full_messages }, status: :unprocessable_entity)
+      end
     end
   end
 
