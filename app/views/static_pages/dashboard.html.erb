@@ -304,6 +304,14 @@
 
       console.log("Name To Sales Person Id: ", nameToSalesPersonId);
 
+      function addPaddingAndLines(row){
+        row.style.borderTop = "3px double #000";
+        row.style.paddingTop = "10px";
+        row.style.borderBottom = "3px double #000";
+        row.style.paddingBottom = "10px";
+        return row;
+      }
+
 			function populateItemSelect(){
 				const select = $('#item-filter');
 				select.find('option').remove();
@@ -481,7 +489,7 @@
                   const count = this.point.custom?.count || 0;
                   return `<div style="text-align: center;">
                     <div>${sales}</div>
-                    <div style="font-size: 12px; color: #777;">${count} sale${count === 1 ? '' : 's'}</div>
+                    <div style="font-size: 12px; color: #777;">${count.toLocaleString()} sale${count === 1 ? '' : 's'}</div>
                   </div>`;
                 },
                 style: {
@@ -549,7 +557,7 @@
 						row.innerHTML = `
 							<td>${date}</td>
 							<td>${itemRecord.name}</td>
-							<td>$${record.item_price}</td>
+							<td>$${record.item_price.toLocaleString()}</td>
 						`;
 						tbody.appendChild(row);
 						dailyTotal += parseFloat(record.item_price);
@@ -558,21 +566,31 @@
 
 					// Only show daily total if there’s more than one day of data
 					if (uniqueDates.length > 1) {
-						const dailyTotalRow = document.createElement('tr');
+						
+            //add a row for spacing
+            const spaceRow = document.createElement('tr');
+            spaceRow.innerHTML = `
+            <td colspan="3"></td>
+            `;
+            tbody.appendChild(spaceRow);
+            
+            const dailyTotalRow = document.createElement('tr');
 						dailyTotalRow.classList.add('daily-total-row');
 						dailyTotalRow.innerHTML = `
 							<td colspan="2" style="text-align: right; font-weight: bold;">Day Total</td>
 							<td><strong>$${dailyTotal.toLocaleString()}</strong></td>
 						`;
+            addPaddingAndLines(dailyTotalRow);
 						tbody.appendChild(dailyTotalRow);
 					}
 
-          //add a row for spacing
+          //add a row for spacing after
           const spaceRow = document.createElement('tr');
           spaceRow.innerHTML = `
-					<td colspan="3"></td>
-				  `;
+          <td colspan="3"></td>
+          `;
           tbody.appendChild(spaceRow);
+
 				});
 
 				// Overall total
@@ -581,6 +599,7 @@
 					<td colspan="2" style="text-align: right;"><strong>Grand Total</strong></td>
 					<td><strong>$${overallTotal.toLocaleString()}</strong></td>
 				`;
+        addPaddingAndLines(totalRow);
 				tbody.appendChild(totalRow);
 
 				const modal = new bootstrap.Modal(document.getElementById('totalSalesModal'));
