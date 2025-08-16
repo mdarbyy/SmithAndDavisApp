@@ -63,7 +63,7 @@
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
 				<div class="modal-body custom-modal">
-					<div class="scrollable-table">
+					<div class="scrollable-table show-scrollbar">
 						<table class="table content" id="itemBreakdownModalTable">
 							<thead>
 								<tr>
@@ -543,7 +543,7 @@
 					groupedByDate[date].push(record);
 				});
 
-				const uniqueDates = Object.keys(groupedByDate);
+				const uniqueDates = Object.keys(groupedByDate).sort();
 
 				uniqueDates.forEach(date => {
 					let dailyTotal = 0;
