@@ -208,9 +208,9 @@
         font-family: 'Handjet';
       }
 
-      .bootstrap-select > .dropdown-toggle, /* dropdown box */
-      .bootstrap-select > .dropdown-toggle:focus, /* dropdown :focus */
-      .bootstrap-select > .dropdown-toggle:hover /* dropdown :hover */
+      .bootstrap-select > .dropdown-toggle,
+      .bootstrap-select > .dropdown-toggle:focus,
+      .bootstrap-select > .dropdown-toggle:hover
       {
         background-color: #e3e7ebff !important;
       }
@@ -374,13 +374,9 @@
         flex-grow: 1;
       }
       
-      .scrollable-form, .scrollable-table, #content-scroll {
+      .scrollable-form, .scrollable-table {
         overflow-y: auto;
         scrollbar-width: none;
-      }
-
-      .scrollable-form::-webkit-scrollbar, #content-scroll::-webkit-scrollbar {
-        display: none;
       }
 
       .search-form {
@@ -418,8 +414,8 @@
       }
 
       .show-scrollbar {
-        overflow-y: auto;
-        scrollbar-width: auto;              
+        overflow-y: auto !important;
+        scrollbar-width: auto !important;              
       }
 
       .unauthenticated {
@@ -531,7 +527,6 @@
         <div class="image-section"></div>
         <div class="form-section">
           <div id="alertContainerUnauthenticated"></div>
-          
           <div class="form-container">
             <h3>Smith & Davis Sales App</h3>
             <%= yield %>
@@ -576,17 +571,24 @@
     $('#currentCount').text(rowCount);
     updateRecordLabel(rowCount);
 
-    $("#content-search").on("keyup", function() {
-      var value = $(this).val().toLowerCase();
+    $("#content-search").on("input",applySearchFilter);
+  });
+  
+  function applySearchFilter() {
+    var value = $('#content-search').val().toLowerCase();
+
+    if (value === "") {
+      $("#content-table-body tr").show();
+    } else {
       $("#content-table-body tr").filter(function() {
         $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
       });
-      var visibleCount = $("#content-table-body tr:visible").length;
-      $('#currentCount').text(visibleCount);
-      updateRecordLabel(visibleCount);
-    });
- 
-  });
+    }
+
+    var visibleCount = $("#content-table-body tr:visible").length;
+    $('#currentCount').text(visibleCount);
+    updateRecordLabel(visibleCount);
+  }
 
   function confirmAndShowSpinner(event, confirmMessage) {
     
@@ -632,10 +634,7 @@
       if (ok) {
         const row = button.closest("tr");
         if (row) row.remove();
-        
-        var rowCount = $('#content-table tbody tr').length;
-        $('#currentCount').text(rowCount);
-        updateRecordLabel(rowCount);
+        applySearchFilter();
 
         const totalElement = document.getElementById("totalCount");
         if (totalElement) {

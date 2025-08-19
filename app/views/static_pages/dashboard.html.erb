@@ -84,7 +84,7 @@
 	<div class="container-fluid">
 		<div class="row">
 			<div class="col-12 col-md-3">
-				<div class="row mb-4">
+				<div class="row mb-3">
           <div class="col">
             <div class="card p-4">
               <h5 class="mb-3 text-center">Change the Date Range</h5>
@@ -162,7 +162,7 @@
 						<div class="tab-pane fade show" id="item-breakdown" role="tabpanel" aria-labelledby="item-breakdown-tab">
 							<div class="row">
 								<div class="col">
-									<div class="scrollable-table dashboard-content">
+									<div class="scrollable-table dashboard-content show-scrollbar">
 										<table class="table content" id="itemBreakdownTable">
 											<thead>
 												<tr>
@@ -200,12 +200,12 @@
           // Save desired direction into dataset for later
           if (screenHeight <= 900) {
             select.classList.add('dropup');
-            if (screenHeight < 600) {
-              card.classList.add('pb-3');
-              card.classList.remove('pb-4');
-            } else {
+            if (screenHeight > 590) {
               card.classList.add('pb-4');
               card.classList.remove('pb-3');
+            } else {
+              card.classList.add('pb-3');
+              card.classList.remove('pb-4');
             }
           } else {
             select.classList.remove('dropup');
@@ -564,9 +564,8 @@
 						overallTotal += parseFloat(record.item_price);
 					});
 
-					// Only show daily total if there’s more than one day of data
+					// Only show day total if there’s more than one day of data
 					if (uniqueDates.length > 1) {
-						
             //add a row for spacing
             const spaceRow = document.createElement('tr');
             spaceRow.innerHTML = `
@@ -658,7 +657,6 @@
 				$('#itemBreakdownModalTableBody').html(rowsHtml);
 				$('#itemBreakdownModal').modal('show');
 			});
-
 		});
 	</script>
 <% end %>
