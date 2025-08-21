@@ -82,106 +82,126 @@
 	</div>
 	
 	<div class="container-fluid">
-		<div class="row">
-			<div class="col-12 col-md-3">
-				<div class="row mb-3">
-          <div class="col">
-            <div class="card p-4">
-              <h5 class="mb-3 text-center">Change the Date Range</h5>
-              <%= form_with url: dashboard_path, method: :get, local: true do |form| %>
-                <div class="mb-3">
-                  <%= form.label :start_date, "Start Date", class: "form-label" %>
-                  <div class="input-group">
-                    <%= form.text_field :start_date, class: "form-control datepicker", required: true, value: (params[:start_date].presence || Date.current.strftime("%m/%d/%Y")) %>
-                    <span class="input-group-text datepicker-icon">
-                      <i class="bi bi-calendar-date"></i>
-                    </span>
-                  </div>
+    <div class="row">
+      <div class="col-12 col-md-3">
+        <div class="mb-4">
+          <div class="card p-4">
+            <h5 class="mb-3 text-center">Change the Date Range</h5>
+            <%= form_with url: dashboard_path, method: :get, local: true do |form| %>
+              <div class="mb-3">
+                <%= form.label :start_date, "Start Date", class: "form-label" %>
+                <div class="input-group">
+                  <%= form.text_field :start_date, class: "form-control datepicker", required: true, value: (params[:start_date].presence || Date.current.strftime("%m/%d/%Y")) %>
+                  <span class="input-group-text datepicker-icon">
+                    <i class="bi bi-calendar-date"></i>
+                  </span>
                 </div>
-                <div class="mb-3">
-                  <%= form.label :end_date, "End Date", class: "form-label" %>
-                  <div class="input-group">
-                    <%= form.text_field :end_date, class: "form-control datepicker", required: true, value: (params[:end_date].presence || Date.current.strftime("%m/%d/%Y")) %>
-                    <span class="input-group-text datepicker-icon">
-                      <i class="bi bi-calendar-date"></i>
-                    </span>
-                  </div>
+              </div>
+
+              <div class="mb-3">
+                <%= form.label :end_date, "End Date", class: "form-label" %>
+                <div class="input-group">
+                  <%= form.text_field :end_date, class: "form-control datepicker", required: true, value: (params[:end_date].presence || Date.current.strftime("%m/%d/%Y")) %>
+                  <span class="input-group-text datepicker-icon">
+                    <i class="bi bi-calendar-date"></i>
+                  </span>
                 </div>
-                <div class="d-flex justify-content-end">
-                  <%= form.submit "Submit", class: "btn btn-main", data: { turbo: false }, onclick:"show_spinner()" %>
-                </div>
-              <% end %>
-            </div>
+              </div>
+
+              <div class="d-flex justify-content-end">
+                <%= form.submit "Submit", class: "btn btn-main", data: { turbo: false }, onclick:"show_spinner()" %>
+              </div>
+            <% end %>
           </div>
         </div>
 
-        <div class="row">
-          <div class="col">
-            <div class="card p-4 mt-auto" id="filterCard">
-              <h5 class="mb-2 text-center">Filters</h5>
+        <div class="card p-4" id="filterCard">
+          <h5 class="mb-2 text-center">Filters</h5>
 
-              <div class="row mb-3">
-								<div class="col d-flex flex-column align-items-center">
-									<select id="sales-person-filter" class="selectpicker btn-secondary filter-select" multiple data-actions-box="true" title="Sales People" data-selected-text-format="count" data-count-selected-text="{0} people selected" data-width="100%"></select>
-								</div>
-							</div>
+          <div class="mb-3 d-flex flex-column align-items-center">
+            <select id="sales-person-filter"
+                    class="selectpicker btn-secondary filter-select"
+                    multiple
+                    data-actions-box="true"
+                    title="Sales People"
+                    data-selected-text-format="count"
+                    data-count-selected-text="{0} people selected"
+                    data-width="100%">
+            </select>
+          </div>
 
-              <div class="row">
-								<div class="col d-flex flex-column align-items-center">
-									<select id="item-filter" class="selectpicker btn-secondary filter-select" multiple data-actions-box="true" title="Items" data-selected-text-format="count" data-count-selected-text="{0} items selected" data-width="100%"></select>
-								</div>
-							</div>
+          <div class="d-flex flex-column align-items-center">
+            <select id="item-filter"
+                    class="selectpicker btn-secondary filter-select"
+                    multiple
+                    data-actions-box="true"
+                    title="Items"
+                    data-selected-text-format="count"
+                    data-count-selected-text="{0} items selected"
+                    data-width="100%">
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-9">
+        <ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <a class="nav-link active"
+              id="total-sales-tab"
+              data-bs-toggle="tab"
+              href="#total-sales"
+              role="tab"
+              aria-controls="total-sales"
+              aria-selected="true">
+              Total Sales
+            </a>
+          </li>
+          <li class="nav-item" role="presentation">
+            <a class="nav-link"
+              id="item-breakdown-tab"
+              data-bs-toggle="tab"
+              href="#item-breakdown"
+              role="tab"
+              aria-controls="item-breakdown"
+              aria-selected="false">
+              Item Breakdown
+            </a>
+          </li>
+        </ul>
+
+        <div class="card border-top-0 rounded-bottom">
+          <div class="card-body tab-content" id="dashboardTabsContent">
+            
+            <div class="tab-pane fade show active"
+                id="total-sales"
+                role="tabpanel"
+                aria-labelledby="total-sales-tab">
+              <div id="total-sales-chart" class="dashboard-content"></div>
+            </div>
+
+            <div class="tab-pane fade"
+                id="item-breakdown"
+                role="tabpanel"
+                aria-labelledby="item-breakdown-tab">
+              <div class="scrollable-table dashboard-content show-scrollbar">
+                <table class="table content" id="itemBreakdownTable">
+                  <thead>
+                    <tr>
+                      <th class="stick" scope="col">Item</th>
+                      <th class="stick" scope="col">Amount Sold</th>
+                    </tr>
+                  </thead>
+                  <tbody id="itemBreakdownTableBody">
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
-			</div>
-
-			<div class="col-12 col-md-9">
-				<ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
-					<li class="nav-item" role="presentation">
-						<a class="nav-link active" id="total-sales-tab" data-bs-toggle="tab" href="#total-sales" role="tab" aria-controls="total-sales" aria-selected="true">
-							Total Sales
-						</a>
-					</li>
-					<li class="nav-item" role="presentation">
-						<a class="nav-link" id="item-breakdown-tab" data-bs-toggle="tab" href="#item-breakdown" role="tab" aria-controls="item-breakdown" aria-selected="true">
-							Item Breakdown
-						</a>
-					</li>
-				</ul>
-
-				<div class="card border-top-0 rounded-bottom">
-					<div class="card-body tab-content" id="dashboardTabsContent">
-						<div class="tab-pane fade show active" id="total-sales" role="tabpanel" aria-labelledby="total-sales-tab">
-							<div class="row">
-								<div class="col">
-									<div id="total-sales-chart" class="dashboard-content"></div>
-								</div>
-							</div>
-						</div>
-						<div class="tab-pane fade show" id="item-breakdown" role="tabpanel" aria-labelledby="item-breakdown-tab">
-							<div class="row">
-								<div class="col">
-									<div class="scrollable-table dashboard-content show-scrollbar">
-										<table class="table content" id="itemBreakdownTable">
-											<thead>
-												<tr>
-													<th class="stick" scope="col">Item</th>
-													<th class="stick" scope="col">Amount Sold</th>
-												</tr>
-											</thead>
-											<tbody id="itemBreakdownTableBody">
-											</tbody>
-										</table>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+      </div>
+    </div>
+  </div>
 <% end %>
 
 <% if @start_date.present? and @end_date.present? %>
@@ -195,20 +215,13 @@
 
         selects.forEach(select => {
           select.setAttribute('data-dropup-auto', 'false');
-          const wrapper = $(select).closest('.bootstrap-select');
-
+          
           // Save desired direction into dataset for later
           if (screenHeight <= 900) {
             select.classList.add('dropup');
-
-            if(screenHeight < 590){
-              card.classList.add('pb-3');
-            }
-
           } else {
             select.classList.remove('dropup');
             select.dataset.forceDirection = 'down';
-            card.classList.remove('pb-3');
           }
         });
       }
