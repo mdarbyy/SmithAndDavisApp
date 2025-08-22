@@ -426,11 +426,35 @@
         .custom-modal{
           max-height: 80vh !important;
         }
+
         .scrollable-table {
           max-height: 75vh !important;
         }
-      }
 
+        .main-content-row {
+          max-height: calc(100vh - 59px - 20px); /* full viewport minus navbar minus space at the bottom */
+          display: flex;
+        }
+
+        .left-col,
+        .right-col {
+          display: flex;
+          flex-direction: column;
+        }
+
+        /* Make the last card in each column expand to fill */
+        .left-col .card:last-child,
+        .right-col .card {
+          flex: 1 1 auto;        /* grow to fill available space */
+          display: flex;
+          flex-direction: column;
+        }
+
+        /* Add some padding at the bottom so nothing touches the edge */
+        .main-content-row {
+          margin-bottom: 2rem !important;
+        }
+      }
     </style>
   </head>
 
