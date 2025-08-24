@@ -9,6 +9,11 @@ class StaticPagesController < ApplicationController
 
     @sales_records = SalesRecord.where(sell_date: @start_date..@end_date)
 
+    if @sales_records.count == 0
+      redirect_to dashboard_path, danger: "No sales were recorded within this date range"
+      return
+    end
+
     sales_person_ids = @sales_records.pluck(:sales_person_id).uniq
     sales_item_ids = @sales_records.pluck(:item_id).uniq
     @sales_people = SalesPerson.where(id: sales_person_ids)

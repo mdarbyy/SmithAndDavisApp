@@ -694,7 +694,7 @@
     DANGER: null
   };
 
-  function alertMessage(message, messageType, delayTime = 2500, isJobStatusAlert = false) {
+  function alertMessage(message, messageType, delayTime = 2500) {
     console.log(message);
     
     var alertTypeKey = messageType.toUpperCase();
@@ -713,37 +713,13 @@
       }
     });
 
-    var iconHTML = '';
-    if ((messageType === "SUCCESS") || 
-      (messageType === "DANGER") || 
-      (messageType === "INFO" && isJobStatusAlert)) {
-      switch (messageType) {
-        case "INFO":
-          iconHTML = '<i class="spinner-border text-primary" style="margin-right: 10px;" role="status"></i>';
-          break;
-        case "SUCCESS":
-          iconHTML = '<i class="bi bi-check-circle-fill text-success" style="margin-right: 10px;"></i>';
-          break;
-        case "DANGER":
-          iconHTML = '<i class="bi bi-x-circle-fill text-danger" style="margin-right: 10px;"></i>';
-          break;
-      }
-    }
-
     var alertId = "alert-" + uuidv4();
     
-    if(isJobStatusAlert){
-      var alertContainerHTML =
-      '<div class="alert d-flex align-items-center" id="' + alertId + '" role="alert" style="text-align: center; z-index: 1000; margin: 1em;">' +
-      '<span style="margin-right: 5px;">' + iconHTML + '</span>' + 
-      '<h5 class="alert-heading mb-0">' + message + '</h5>' +
-      '</div>';
-    } else {
-      var alertContainerHTML =
-      '<div class="alert" id="' + alertId + '" role="alert" style="text-align: center; z-index: 9999; margin: 1em;">' +
-      '<h5 class="alert-heading">' + message + '</h5>' +
-      '</div>';
-    }
+    var alertContainerHTML =
+    '<div class="alert" id="' + alertId + '" role="alert" style="text-align: center; z-index: 9999; margin: 1em;margin-left: 250px;">' +
+    '<h5 class="alert-heading">' + message + '</h5>' +
+    '</div>';
+    
     
     <% if user_signed_in? %>
       $('#alertContainer').append(alertContainerHTML);
@@ -841,7 +817,7 @@
   <% if flash[:success] %>
     alertMessage('<%= j flash[:success] %>','SUCCESS', 2500);
   <% elsif flash[:danger] %>
-    alertMessage('<%= j flash[:danger] %>','DANGER', 2500);
+    alertMessage('<%= j flash[:danger] %>','DANGER', 3000);
   <% elsif flash[:notice] %>
     alertMessage('<%= j flash[:notice] %>','INFO',2500);
   <% end %>

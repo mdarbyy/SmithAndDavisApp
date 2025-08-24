@@ -1,6 +1,6 @@
 <% if @start_date.blank? || @end_date.blank? %>
-  <div class="d-flex justify-content-center align-items-center" style="min-height: 60vh;">
-    <div class="card p-4" style="max-width: 450px; width: 100%;">
+  <div class="d-flex justify-content-center align-items-center" style="height: calc(100vh - 180px);">
+    <div class="card p-4" style="max-width: 400px; width: 100%;">
       <h4 class="mb-3 text-center">Select a Date Range</h4>
       <%= form_with url: dashboard_path, method: :get, local: true do |form| %>
         <div class="mb-3">
@@ -187,7 +187,7 @@
                   <thead>
                     <tr>
                       <th class="stick" scope="col">Item</th>
-                      <th class="stick" scope="col">Amount Sold</th>
+                      <th class="stick" scope="col">Sold</th>
                     </tr>
                   </thead>
                   <tbody id="itemBreakdownTableBody">
@@ -313,10 +313,8 @@
 
       console.log("Name To Sales Person Id: ", nameToSalesPersonId);
 
-      function addPaddingAndLines(row){
-        row.style.borderTop = "3px double #000";
+      function addPadding(row){
         row.style.paddingTop = "10px";
-        row.style.borderBottom = "3px double #000";
         row.style.paddingBottom = "10px";
         return row;
       }
@@ -588,7 +586,7 @@
 							<td colspan="2" style="text-align: right; font-weight: bold;">Day Total</td>
 							<td><strong>$${dailyTotal.toLocaleString()}</strong></td>
 						`;
-            addPaddingAndLines(dailyTotalRow);
+            addPadding(dailyTotalRow);
 						tbody.appendChild(dailyTotalRow);
 					}
 
@@ -607,7 +605,7 @@
 					<td colspan="2" style="text-align: right;"><strong>Grand Total</strong></td>
 					<td><strong>$${overallTotal.toLocaleString()}</strong></td>
 				`;
-        addPaddingAndLines(totalRow);
+        addPadding(totalRow);
 				tbody.appendChild(totalRow);
 
 				const modal = new bootstrap.Modal(document.getElementById('totalSalesModal'));
@@ -630,42 +628,65 @@
 			});
 
 			$(document).on('click', '.clickable-item', function (e) {
-				e.preventDefault();
+        e.preventDefault();
 
-				const itemId = $(this).data('item-id');
-				const itemData = groupedSales[itemId];
+        const itemId = $(this).data('item-id');
+        const itemData = groupedSales[itemId];
 
-				if (!itemData) return;
+        if (!itemData) return;
 
-				const itemName = itemData.name;
-				const records = itemData.records;
+        const itemName = itemData.name;
+        const records = itemData.records;
 
+        // Sort by date
         records.sort((a, b) => 
           luxon.DateTime.fromISO(a.sell_date) - luxon.DateTime.fromISO(b.sell_date)
         );
 
-				// Set modal title values
-				$('#itemName').text(itemName);
-				$('#itemCount').text(records.length);
+        // Set modal title values
+        $('#itemName').text(itemName);
+        $('#itemCount').text(records.length);
 
-				// Build table rows
-				const rowsHtml = records.map(record => {
-					const salesPersonName = salesPersonIdToName[record.sales_person_id];
-					const sellDate = luxon.DateTime.fromISO(record.sell_date).toFormat('MM/dd/yyyy');
-					const itemPrice = `$${parseFloat(record.item_price)}`;
+        const tbody = document.querySelector('#itemBreakdownModalTableBody');
+        tbody.innerHTML = '';
 
-					return `
-						<tr>
-							<td>${salesPersonName}</td>
-							<td>${sellDate}</td>
-							<td>${itemPrice}</td>
-						</tr>
-					`;
-				}).join('');
+        let overallTotal = 0;
 
-				$('#itemBreakdownModalTableBody').html(rowsHtml);
-				$('#itemBreakdownModal').modal('show');
-			});
+        records.forEach(record => {
+          const salesPersonName = salesPersonIdToName[record.sales_person_id];
+          const sellDate = luxon.DateTime.fromISO(record.sell_date).toFormat('MM/dd/yyyy');
+          const itemPrice = parseFloat(record.item_price);
+
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${salesPersonName}</td>
+            <td>${sellDate}</td>
+            <td>$${itemPrice.toLocaleString()}</td>
+          `;
+          tbody.appendChild(row);
+
+          overallTotal += itemPrice;
+        });
+
+        // Add spacing row
+        const spaceRow = document.createElement('tr');
+        spaceRow.innerHTML = `<td colspan="3"></td>`;
+        tbody.appendChild(spaceRow);
+
+        // Add total row
+        const totalRow = document.createElement('tr');
+        totalRow.innerHTML = `
+          <td colspan="2" style="text-align: right;"><strong>Total</strong></td>
+          <td><strong>$${overallTotal.toLocaleString()}</strong></td>
+        `;
+        addPadding(totalRow);
+        tbody.appendChild(totalRow);
+
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('itemBreakdownModal'));
+        modal.show();
+      });
+
 		});
 	</script>
 <% end %>

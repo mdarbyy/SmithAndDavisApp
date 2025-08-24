@@ -42,11 +42,7 @@ class UsersController < ApplicationController
     user_parameters.delete(:password) if user_parameters[:password].blank?
 
     if @user.update(user_parameters)
-      
-      if current_user.id == @user.id
-        bypass_sign_in(current_user)
-      end
-      
+      bypass_sign_in(@user) if current_user.id == @user.id
       redirect_to(session.delete(:return_to) || users_path, success: 'User was updated')
     else
       flash.now[:danger] = @user.errors.full_messages.first
