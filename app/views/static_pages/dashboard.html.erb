@@ -285,7 +285,6 @@
 					};
 				}
 				groupedSales[record.item_id].records.push(record);
-        record.sales_person_name = salesPersonIdToName[record.sales_person_id];
 			});
 
 			const groupedSalesArray = Object.entries(groupedSales).map(([item_id, data]) => ({
@@ -542,9 +541,22 @@
 
 				let overallTotal = 0;
 
+        // First sort the records
+        const sortedRecords = filteredRecords.sort((a, b) => {
+          // Compare by date
+          const dateA = new Date(a.sell_date);
+          const dateB = new Date(b.sell_date);
+
+          if (dateA < dateB) return -1;
+          if (dateA > dateB) return 1;
+
+          // If dates are the same, compare by id ascending
+          return a.id - b.id;
+        });
+
 				// Group records by date
 				const groupedByDate = {};
-				filteredRecords.forEach(record => {
+				sortedRecords.forEach(record => {
 					const date = luxon.DateTime.fromISO(record.sell_date).toFormat('MM/dd/yyyy');
 					if (!groupedByDate[date]) groupedByDate[date] = [];
 					groupedByDate[date].push(record);

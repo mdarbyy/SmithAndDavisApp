@@ -715,11 +715,17 @@
 
     var alertId = "alert-" + uuidv4();
     
-    var alertContainerHTML =
-    '<div class="alert" id="' + alertId + '" role="alert" style="text-align: center; z-index: 9999; margin: 1em;margin-left: 250px;">' +
-    '<h5 class="alert-heading">' + message + '</h5>' +
-    '</div>';
-    
+    <% if user_signed_in? %>
+      var alertContainerHTML =
+      '<div class="alert" id="' + alertId + '" role="alert" style="text-align: center; z-index: 9999; margin: 1em; margin-left: 250px;">' +
+      '<h5 class="alert-heading">' + message + '</h5>' +
+      '</div>';
+    <% else %>
+      var alertContainerHTML =
+      '<div class="alert" id="' + alertId + '" role="alert" style="text-align: center; z-index: 9999; margin: 1em;">' +
+      '<h5 class="alert-heading">' + message + '</h5>' +
+      '</div>';
+    <% end %>
     
     <% if user_signed_in? %>
       $('#alertContainer').append(alertContainerHTML);
@@ -764,7 +770,8 @@
 
   $('th').click(function() {
     
-    if ($(this).closest('table').attr('id') == "totalSalesModalTable") {
+    // skip if this <th> is inside a modal
+    if ($(this).closest('.modal').length > 0) {
       return;
     }
     
