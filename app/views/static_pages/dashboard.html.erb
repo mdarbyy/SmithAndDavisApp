@@ -188,6 +188,7 @@
                     <tr>
                       <th class="stick" scope="col">Item</th>
                       <th class="stick" scope="col">Sold</th>
+                      <th class="stick" scope="col">Amount</th>
                     </tr>
                   </thead>
                   <tbody id="itemBreakdownTableBody">
@@ -375,10 +376,17 @@
         }).filter(item => item.records.length > 0);
 
         filteredItems.forEach(item => {
+          
+          // sum up the item_price values in the records
+          const totalAmount = item.records.reduce((sum, record) => {
+            return sum + record.item_price;
+          }, 0);
+          
           const rowHtml = `
             <tr>
               <td>${item.name}</td>
               <td><a href="#" class="nav-link clickable-item" data-item-id="${item.item_id}">${item.records.length}</a></td>
+              <td>$${totalAmount.toLocaleString()}</td>
             </tr>
           `;
           tableBody.append(rowHtml);
