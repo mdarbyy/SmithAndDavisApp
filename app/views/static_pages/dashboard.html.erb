@@ -463,10 +463,10 @@
             text: `
               <div style="text-align: center;">
                 <div style="font-size: 18px; font-weight: bold; color: #333;">
-                  $${Highcharts.numberFormat(totalSales, 0, '.', ',')}
+                  $${totalSales.toLocaleString()}
                 </div>
                 <div style="font-size: 14px; font-weight: bold; color: #777;">
-                  ${filteredSales.length} sale${filteredSales.length === 1 ? '' : 's'}
+                  ${filteredSales.length.toLocaleString()} sale${filteredSales.length === 1 ? '' : 's'}
                 </div>
               </div>
             `
