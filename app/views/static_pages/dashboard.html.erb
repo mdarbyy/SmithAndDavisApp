@@ -171,18 +171,29 @@
         <div class="card border-top-0 rounded-bottom">
           <div class="card-body tab-content" id="dashboardTabsContent">
             
-            <div class="tab-pane fade show active"
-                id="total-sales"
-                role="tabpanel"
-                aria-labelledby="total-sales-tab">
-              <div id="total-sales-chart" class="dashboard-content"></div>
+            <div class="tab-pane fade show active dashboard-content"
+              id="total-sales"
+              role="tabpanel"
+              aria-labelledby="total-sales-tab">
+              
+              <% if current_user.show_export_buttons %>
+                <div class="mb-1 d-flex justify-content-end">
+                  <button id="export-total-sales-chart" class="btn btn-main">Export to Excel</button>
+                </div>
+              <% end %>
+              <div id="total-sales-chart"></div>
             </div>
 
-            <div class="tab-pane fade"
-                id="item-breakdown"
-                role="tabpanel"
-                aria-labelledby="item-breakdown-tab">
-              <div class="scrollable-table dashboard-content show-scrollbar">
+            <div class="tab-pane fade dashboard-content"
+              id="item-breakdown"
+              role="tabpanel"
+              aria-labelledby="item-breakdown-tab">
+              <% if current_user.show_export_buttons %>
+                <div class="mb-1 d-flex justify-content-end">
+                  <button id="export-item-breakdown-table" class="btn btn-main">Export to Excel</button>
+                </div>
+              <% end %>
+              <div class="scrollable-table dashboard-table show-scrollbar">
                 <table class="table content" id="itemBreakdownTable">
                   <thead>
                     <tr>
@@ -391,6 +402,78 @@
           `;
           tableBody.append(rowHtml);
         });
+
+        // 🟢 Excel export for item breakdown table
+        $('#export-item-breakdown-table').off('click').on('click', () => {
+          const startDate = "<%= @start_date.strftime('%m/%d/%Y') %>";
+          const endDate = "<%= @end_date.strftime('%m/%d/%Y') %>";
+          
+          // Extract data directly from the table
+          const rows = [];
+          $('#itemBreakdownTable tbody tr').each(function() {
+            const cells = $(this).find('td');
+            rows.push({
+              'Item': $(cells[0]).text().trim(),
+              'Sold': $(cells[1]).text().trim(),
+              'Amount': $(cells[2]).text().trim()
+            });
+          });
+
+          if (rows.length === 0) {
+            return;
+          }
+
+          // Create worksheet starting at row 3 (leaving space for the title)
+          const ws = XLSX.utils.json_to_sheet(rows, { origin: 'A5', skipHeader: true });
+
+          // Add the date header row
+          XLSX.utils.sheet_add_aoa(ws, [
+            [`Item Breakdown from ${startDate} to ${endDate}`],
+            [], // blank row
+            ['Item', 'Sold', 'Amount'],
+            [], //blank row before data
+          ], { origin: 'A1' });
+
+          // Merge the top row across 3 columns (A1:C1)
+          ws['!merges'] = [{ s: { r:0, c:0 }, e: { r:0, c:2 } }];
+
+          // Style adjustments: set column widths
+          ws['!cols'] = [
+            { wch: 50 }, // Item
+            { wch: 10 }, // Sold
+            { wch: 15 }  // Amount
+          ];
+
+          // Apply bold to the first header row (row 3)
+          const headerRowNum = 3; // 1-indexed in Excel, 0-based in SheetJS
+          ['A', 'B', 'C'].forEach(col => {
+            const cell = ws[`${col}${headerRowNum}`];
+            if (cell) {
+              if (!cell.s) cell.s = {};
+              cell.s.font = { bold: true };
+            }
+          });
+
+          // Apply currency formatting to the Amount column (C)
+          for (let i = 0; i < rows.length; i++) {
+            const cellRef = `C${i + 4}`; // data starts at row 4
+            const cell = ws[cellRef];
+            if (cell) {
+              if (!cell.s) cell.s = {};
+              cell.z = '$#,##0.00'; // currency format
+            }
+          }
+
+          // Make the title bold and centered
+          if (!ws['A1'].s) ws['A1'].s = {};
+          ws['A1'].s.font = { bold: true };
+          ws['A1'].s.alignment = { horizontal: 'center' };
+
+          // Create and download workbook
+          const wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, ws, 'Item Breakdown');
+          XLSX.writeFile(wb, `item_breakdown${startDate}-${endDate}.xlsx`);
+        });
 			}
 			
 			function renderTotalSalesChart() {
@@ -525,6 +608,58 @@
             enabled: false
           }
 				});
+
+        $('#export-total-sales-chart').off('click').on('click', () => {
+          
+          const startDate = "<%= @start_date.strftime('%m/%d/%Y') %>";
+          const endDate = "<%= @end_date.strftime('%m/%d/%Y') %>";
+          
+          // Prepare JSON data for Excel
+          const excelData = categories.map((cat, idx) => {
+          const point = data[idx] || {};
+            return {
+              'Sales Person': cat,
+              'Total Sales': point.y,
+              'Number of Sales': point.custom?.count
+            };
+          });
+
+          // Start actual data at row 5 now (since A1 = title, A2 = blank, A3 = headers, A4 = blank)
+          const ws = XLSX.utils.json_to_sheet(excelData, { origin: 'A5', skipHeader: true });
+
+          // Add header title
+          XLSX.utils.sheet_add_aoa(ws, [
+            [`Total Sales from ${startDate} to ${endDate}`],
+            [], // blank row
+            ['Sales Person', 'Total Sales', 'Number of Sales'],
+            []  // blank row before data
+          ], { origin: 'A1' });
+
+          // Merge top row across 3 columns (A1:C1)
+          ws['!merges'] = [{ s: { r:0, c:0 }, e: { r:0, c:2 } }];
+
+          // Set column widths for neatness
+          ws['!cols'] = [
+            { wch: 30 }, // Sales Person
+            { wch: 18 }, // Total Sales
+            { wch: 18 }  // Number of Sales
+          ];
+
+          // Format Total Sales ($) as currency
+          for (let i = 0; i < excelData.length; i++) {
+            const cellRef = `B${i + 5}`; // column B, starting row 5
+            const cell = ws[cellRef];
+            if (cell) {
+              cell.z = '$#,##0.00';
+            }
+          }
+
+          const wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, ws, 'Total Sales');
+
+          // Trigger download
+          XLSX.writeFile(wb, `total_sales${startDate}-${endDate}.xlsx`);
+        });
     	}
 
 			function showTotalSalesForClickedPerson(clickedName) {

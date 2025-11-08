@@ -75,6 +75,9 @@
     <script src="https://code.highcharts.com/modules/exporting.js"></script>
     <script src="https://code.highcharts.com/modules/accessibility.js"></script>
 
+    <!-- Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
     <%= javascript_importmap_tags %>
 
     <style>
@@ -191,6 +194,13 @@
         color: var(--main-color);
       }
 
+      #total-sales-chart {
+        flex: 1;
+        width: 100%;
+        min-height: 0;
+        height: calc(100vh - 180px);
+      }
+
       .authenticated {
         background: white;
         background-attachment: fixed;
@@ -258,9 +268,48 @@
         max-height: 90vh;
       }
 
+      .custom-checkbox input[type="checkbox"] {
+        display: none;
+      }
+
+      .custom-checkbox .checkmark {
+        background-color: transparent;
+        border: 1px solid var(--main-color) !important;
+        border-radius: 4px;
+        cursor: pointer;
+        display: inline-block;
+        height: 20px;
+        margin-top: 7px;
+        position: relative;
+        width: 20px;
+      }
+
+      .custom-checkbox .checkmark:after {
+        border: solid white;
+        border-width: 0 3px 3px 0;
+        content: "";
+        display: none;
+        height: 10px;
+        left: 6px;
+        position: absolute;
+        top: 2px;
+        transform: rotate(45deg);
+        width: 6px;
+      }
+
+      .custom-checkbox input[type="checkbox"]:checked + .checkmark {
+        background-color: var(--main-color);
+      }
+
+      .custom-checkbox input[type="checkbox"]:checked + .checkmark:after {
+        display: block;
+      }
+
       .dashboard-content {
-        height: calc(100vh - 157px);
-        width: 100%;
+        height: calc(100vh - 155px);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
       }
 
       .datepicker table tr td.active, .datepicker table tr td.active:hover, .datepicker table tr td span.active, .datepicker table tr td span.active:hover, .bootstrap-select .dropdown-menu li a:active {
@@ -362,6 +411,10 @@
         max-height: 85vh;
       }
 
+      .dashboard-table {
+        height: calc(85vh - 65px) !important;
+      }
+
       .scrollable-form {
         flex-grow: 1;
       }
@@ -429,6 +482,10 @@
 
         .scrollable-table {
           max-height: 75vh !important;
+        }
+
+        .dashboard-table {
+          height: calc(85vh - 100px) !important;
         }
 
         .main-content-row {
