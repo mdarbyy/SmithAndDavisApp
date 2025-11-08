@@ -404,7 +404,7 @@
         });
 
         // 🟢 Excel export for item breakdown table
-        $('#export-item-breakdown-table').off('click').on('click', () => {
+        $('#export-item-breakdown-table').off('click').on('click', async () => {
           const startDate = "<%= @start_date.strftime('%m/%d/%Y') %>";
           const endDate = "<%= @end_date.strftime('%m/%d/%Y') %>";
           
@@ -413,9 +413,9 @@
           $('#itemBreakdownTable tbody tr').each(function() {
             const cells = $(this).find('td');
             rows.push({
-              'Item': $(cells[0]).text().trim(),
-              'Sold': $(cells[1]).text().trim(),
-              'Amount': $(cells[2]).text().trim()
+              item: $(cells[0]).text().trim(),
+              sold: $(cells[1]).text().trim(),
+              amount: $(cells[2]).text().trim()
             });
           });
 
@@ -423,56 +423,50 @@
             return;
           }
 
-          // Create worksheet starting at row 3 (leaving space for the title)
-          const ws = XLSX.utils.json_to_sheet(rows, { origin: 'A5', skipHeader: true });
+          // Create workbook and worksheet
+          const wb = new ExcelJS.Workbook();
+          const ws = wb.addWorksheet('Item Breakdown');
 
-          // Add the date header row
-          XLSX.utils.sheet_add_aoa(ws, [
-            [`Item Breakdown from ${startDate} to ${endDate}`],
-            [], // blank row
-            ['Item', 'Sold', 'Amount'],
-            [], //blank row before data
-          ], { origin: 'A1' });
+          // --- Row 1: merged title ---
+          ws.mergeCells('A1:C1');
+          const titleCell = ws.getCell('A1');
+          titleCell.value = `Item Breakdown from ${startDate} to ${endDate}`;
+          titleCell.font = { bold: true, size: 13 };
+          titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
 
-          // Merge the top row across 3 columns (A1:C1)
-          ws['!merges'] = [{ s: { r:0, c:0 }, e: { r:0, c:2 } }];
+          // --- Row 2: blank spacer ---
+          ws.addRow([]);
 
-          // Style adjustments: set column widths
-          ws['!cols'] = [
-            { wch: 50 }, // Item
-            { wch: 10 }, // Sold
-            { wch: 15 }  // Amount
-          ];
+          // --- Row 3: headers ---
+          const headerRow = ws.addRow(['Item', 'Sold', 'Amount']);
+          headerRow.font = { bold: true };
+          headerRow.alignment = { horizontal: 'center', vertical: 'middle' };
 
-          // Apply bold to the first header row (row 3)
-          const headerRowNum = 3; // 1-indexed in Excel, 0-based in SheetJS
-          ['A', 'B', 'C'].forEach(col => {
-            const cell = ws[`${col}${headerRowNum}`];
-            if (cell) {
-              if (!cell.s) cell.s = {};
-              cell.s.font = { bold: true };
-            }
+          // --- Row 4: blank spacer ---
+          ws.addRow([]);
+
+          // --- Row 5+: table data ---
+          rows.forEach(r => {
+            const row = ws.addRow([r.item, r.sold, r.amount]);
+            row.alignment = { horizontal: 'center', vertical: 'middle' };
           });
 
-          // Apply currency formatting to the Amount column (C)
-          for (let i = 0; i < rows.length; i++) {
-            const cellRef = `C${i + 4}`; // data starts at row 4
-            const cell = ws[cellRef];
-            if (cell) {
-              if (!cell.s) cell.s = {};
-              cell.z = '$#,##0.00'; // currency format
-            }
-          }
+          // --- Column widths ---
+          ws.getColumn(1).width = 45; // Item
+          ws.getColumn(2).width = 10; // Sold
+          ws.getColumn(3).width = 15; // Amount
 
-          // Make the title bold and centered
-          if (!ws['A1'].s) ws['A1'].s = {};
-          ws['A1'].s.font = { bold: true };
-          ws['A1'].s.alignment = { horizontal: 'center' };
+          // --- Center all cells ---
+          ws.eachRow({ includeEmpty: false }, row => {
+            row.eachCell(cell => {
+              cell.alignment = { horizontal: 'center', vertical: 'middle' };
+            });
+          });
 
-          // Create and download workbook
-          const wb = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(wb, ws, 'Item Breakdown');
-          XLSX.writeFile(wb, `item_breakdown${startDate}-${endDate}.xlsx`);
+          // --- Download ---
+          const buf = await wb.xlsx.writeBuffer();
+          const fileName = `item_breakdown_${startDate.replace(/\//g, '-')}_to_${endDate.replace(/\//g, '-')}.xlsx`;
+          saveAs(new Blob([buf], { type: 'application/octet-stream' }), fileName);
         });
 			}
 			
@@ -609,41 +603,70 @@
           }
 				});
 
-        $('#export-total-sales-chart').off('click').on('click', () => {
+        $('#export-total-sales-chart').off('click').on('click', async () => {
           
           const startDate = "<%= @start_date.strftime('%m/%d/%Y') %>";
           const endDate = "<%= @end_date.strftime('%m/%d/%Y') %>";
           
           // Prepare JSON data for Excel
           const excelData = categories.map((cat, idx) => {
-          const point = data[idx] || {};
+            const point = data[idx] || {};
             return {
-              'Sales Person': cat,
-              'Total Sales': point.y,
-              'Number of Sales': point.custom?.count
+              salesPerson: cat,
+              totalSales: point.y,
+              numberOfSales: point.custom?.count
             };
           });
 
-          // Start actual data at row 5 now (since A1 = title, A2 = blank, A3 = headers, A4 = blank)
-          const ws = XLSX.utils.json_to_sheet(excelData, { origin: 'A5', skipHeader: true });
+          if (excelData.length === 0) {
+            return;
+          }
 
-          // Add header title
-          XLSX.utils.sheet_add_aoa(ws, [
-            [`Total Sales from ${startDate} to ${endDate}`],
-            [], // blank row
-            ['Sales Person', 'Total Sales', 'Number of Sales'],
-            []  // blank row before data
-          ], { origin: 'A1' });
+          // Create workbook & worksheet
+          const wb = new ExcelJS.Workbook();
+          const ws = wb.addWorksheet('Total Sales');
 
-          // Merge top row across 3 columns (A1:C1)
-          ws['!merges'] = [{ s: { r:0, c:0 }, e: { r:0, c:2 } }];
+          // Row 1: Merged title
+          ws.mergeCells('A1:C1');
+          const titleCell = ws.getCell('A1');
+          titleCell.value = `Total Sales from ${startDate} to ${endDate}`;
+          titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
+          titleCell.font = { bold: true, size: 12 };
 
-          // Set column widths for neatness
-          ws['!cols'] = [
-            { wch: 30 }, // Sales Person
-            { wch: 18 }, // Total Sales
-            { wch: 18 }  // Number of Sales
-          ];
+          // Row 2: blank (ExcelJS will leave empty row if we don't add anything)
+
+          // Row 3: headers
+          const headerRow = ws.getRow(3);
+          headerRow.values = ['Sales Person', 'Total Sales ($)', 'Number of Sales'];
+          headerRow.font = { bold: true };
+          headerRow.alignment = { horizontal: 'center', vertical: 'middle' };
+
+          // Row 4: blank
+
+          // Starting at row 5, insert data
+          let rowIndex = 5;
+          excelData.forEach(r => {
+            const row = ws.getRow(rowIndex);
+            row.getCell(1).value = r.salesPerson;
+            row.getCell(2).value = r.totalSales;
+            row.getCell(3).value = r.numberOfSales;
+
+            // Align all three cells center
+            [1,2,3].forEach(c => {
+              row.getCell(c).alignment = { horizontal: 'center', vertical: 'middle' };
+            });
+
+            // Format currency for column 2
+            row.getCell(2).numFmt = '"$"#,##0.00;[Red]-"$"#,##0.00';
+
+            row.commit();
+            rowIndex++;
+          });
+
+          // Set column widths
+          ws.getColumn(1).width = 25;
+          ws.getColumn(2).width = 18;
+          ws.getColumn(3).width = 18;
 
           // Format Total Sales ($) as currency
           for (let i = 0; i < excelData.length; i++) {
@@ -654,11 +677,10 @@
             }
           }
 
-          const wb = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(wb, ws, 'Total Sales');
-
-          // Trigger download
-          XLSX.writeFile(wb, `total_sales${startDate}-${endDate}.xlsx`);
+          // Generate file and trigger download
+          const buf = await wb.xlsx.writeBuffer();
+          const fileName = `total_sales_${startDate.replace(/\//g, '-')}_to_${endDate.replace(/\//g, '-')}.xlsx`;
+          saveAs(new Blob([buf], { type: 'application/octet-stream' }), fileName);
         });
     	}
 
