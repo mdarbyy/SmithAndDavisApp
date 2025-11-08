@@ -1,0 +1,15 @@
+<tr>
+  <td><%= link_to "#{shift.sales_person.first_name} #{shift.sales_person.last_name}", edit_shift_path(shift), class: "nav-link" %></td>
+  <td><%= shift.shift_date.strftime("%m/%d/%Y") %></td>
+  <td><%= shift.sales_floor_hours %></td>
+  <td>
+    <button class="btn btn-delete"
+      type="button"
+      data-entity="shifts"
+      data-entity-name="Shift"
+      data-id="<%= shift.id %>"
+      onclick="deleteEntity(event)">
+      Delete
+    </button>
+  </td>
+</tr>

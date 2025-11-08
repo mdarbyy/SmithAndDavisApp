@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_11_07_221743) do
+ActiveRecord::Schema[7.0].define(version: 2025_11_08_150559) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -44,6 +44,15 @@ ActiveRecord::Schema[7.0].define(version: 2025_11_07_221743) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "shifts", force: :cascade do |t|
+    t.bigint "sales_person_id", null: false
+    t.date "shift_date"
+    t.decimal "sales_floor_hours", precision: 7, scale: 2, default: "1.0"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["sales_person_id"], name: "index_shifts_on_sales_person_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -61,4 +70,5 @@ ActiveRecord::Schema[7.0].define(version: 2025_11_07_221743) do
 
   add_foreign_key "sales_records", "items"
   add_foreign_key "sales_records", "sales_people"
+  add_foreign_key "shifts", "sales_people"
 end

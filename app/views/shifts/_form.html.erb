@@ -1,0 +1,65 @@
+<%= form_with model: shift, local: true, id: "shift-form" do |form| %>
+  
+  <div class="row g-3 mb-3 align-items-center">
+    <div class="col-12">
+      <label class="col-form-label"><strong>Sales Person</strong></label>
+      <select id="sales_person" class="form-control select2">
+        <%= options_from_collection_for_select(SalesPerson.all.order(:first_name, :last_name), :id, ->(sp) { "#{sp.first_name} #{sp.last_name}" }) %>
+    
+        <%= hidden_field_tag "shift[sales_person_id]", "", id: "sales_person_id" %>
+      </select>
+    </div>
+  </div>
+  
+  <div class="row g-3 mb-3 align-items-center">
+    <div class="col-12">
+      <label class="col-form-label"><strong>Shift Date</strong></label>
+      <div class="input-group">
+        <input type="text" id="shift_date" class="form-control datepicker" value="<%= Date.today.strftime('%m/%d/%Y') %>" />
+        <span class="input-group-text datepicker-icon">
+          <i class="bi bi-calendar-date"></i>
+        </span>
+        <%= hidden_field_tag "shift[shift_date]", "", id: "hidden_shift_date" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-3 align-items-center">
+    <div class="col-12">
+      <label class="col-form-label"><strong>Sales Floor Hours</strong></label>
+      <%= form.number_field :sales_floor_hours, step: 0.5, class: "form-control" %>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12 d-flex justify-content-end">
+      <%= form.submit 'Submit', class: 'btn btn-main', data: { turbo: false }, onclick:"show_spinner()" %>
+    </div>
+  </div>
+<% end %>
+
+<script>
+  
+  $(document).ready(function() {
+
+    const form = document.getElementById("shift-form");
+    const salesPerson = document.getElementById("sales_person");
+    const hiddenSalesPersonField = document.getElementById("sales_person_id");
+    const hiddenShiftField = document.getElementById("hidden_shift_date");
+    const shiftDate = document.getElementById("shift_date");
+
+    // Inject sales person on submit
+    form.addEventListener("submit", function (event) {
+      if (!salesPerson.value || !shiftDate.value) {
+        alert("Sales Person and Shift Date are required.");
+        event.preventDefault();
+        return false;
+      }
+
+      hiddenSalesPersonField.value = salesPerson.value;
+      hiddenShiftField.value = shiftDate.value;
+    });
+
+  });
+  
+</script>

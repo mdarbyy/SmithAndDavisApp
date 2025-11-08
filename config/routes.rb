@@ -1,12 +1,11 @@
 Rails.application.routes.draw do
-
   devise_for :users, controllers: {
     sessions: 'users/sessions',
     registrations: 'users/registrations'
   }
 
   authenticated :user do
-
+    resources :shifts
     resources :sales_records
     resources :items
     resources :sales_people

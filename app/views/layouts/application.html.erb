@@ -79,7 +79,6 @@
     <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
-
     <%= javascript_importmap_tags %>
 
     <style>
@@ -551,6 +550,9 @@
                   </li>
                   <li class="list-group-item">
                     <%= link_to "Sales People", sales_people_path, class: "dashboard-link sidebar-nav-link #{'active' if current_page?(sales_people_path)}" %>
+                  </li>
+                  <li class="list-group-item">
+                    <%= link_to "Shifts", shifts_path, class: "dashboard-link sidebar-nav-link #{'active' if current_page?(shifts_path)}" %>
                   </li>
                   <li class="list-group-item">
                     <%= link_to "Sales Records", sales_records_path, class: "dashboard-link sidebar-nav-link #{'active' if current_page?(sales_records_path)}" %>
