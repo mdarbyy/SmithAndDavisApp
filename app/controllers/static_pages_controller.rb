@@ -8,6 +8,7 @@ class StaticPagesController < ApplicationController
     @end_date = Date.strptime(params[:end_date], '%m/%d/%Y')
 
     @sales_records = SalesRecord.where(sell_date: @start_date..@end_date)
+    @shifts = Shift.where(shift_date: @start_date..@end_date)
 
     if @sales_records.count == 0
       redirect_to request.referrer, danger: "No sales were recorded within this date range"

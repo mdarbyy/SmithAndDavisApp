@@ -252,11 +252,13 @@
       
       const salesRecords = <%= raw @sales_records.to_json %>;
 			const salesPeople = <%= raw @sales_people.to_json %>;
-			const Items = <%= raw @items.to_json %>;
+			const items = <%= raw @items.to_json %>;
+      const shifts = <%= raw @shifts.to_json %>;
 
 			console.log("Sales Records:", salesRecords);
 			console.log("Sales People:", salesPeople);
-			console.log("Items:", Items);
+			console.log("Items:", items);
+      console.log("Shifts:", shifts);
 
 			const salesPersonIdToName = {};
 			salesPeople.forEach(sp => {
@@ -267,7 +269,7 @@
       console.log("SalesPersonIdToName: ", salesPersonIdToName);
 
       const itemIdToName = {};
-			Items.forEach(item => {
+			items.forEach(item => {
 				itemIdToName[item.id] = item.name;
 			});
 
@@ -482,17 +484,45 @@
         .map(id => salesPersonIdToName[id.toString()]);
 
 				const filteredData = selectedPeopleNames.map(name => {
+          const id = nameToSalesPersonId[name];
+
+          // All sales for this person + item filter
+          const personSales = salesRecords.filter(record =>
+            record.sales_person_id === id &&
+            selectedItems.includes(record.item_id.toString())
+          );
+
+          const salesDates = [...new Set(personSales.map(s => s.sell_date))];
+          const totalSales = personSales.reduce((sum, sale) => sum + sale.item_price, 0);
+          const numberOfSales = personSales.length;
+
+          // Only include shifts that match sales dates
+          const personShifts = shifts.filter(shift =>
+            shift.sales_person_id === id &&
+            salesDates.includes(shift.shift_date)
+          );
+
+          const totalHours = personShifts.reduce((sum, shift) => {
+            return sum + (parseFloat(shift.sales_floor_hours) || 0);
+          }, 0);
+
+          const avgPerHour = totalHours > 0 ? totalSales / totalHours : 0;
+
+          // Keep your old logic for item totals if needed
           const itemTotals = totalsByPerson[name] || {};
           const total = Object.entries(itemTotals)
             .filter(([itemName]) => selectedItemNames.includes(itemName))
             .reduce((sum, [, amount]) => sum + amount, 0);
-          return [name, total];
-        }).filter(([, total]) => total > 0);
 
-				const nameToSalesPersonId = {};
-				Object.entries(salesPersonIdToName).forEach(([id, name]) => {
-					nameToSalesPersonId[name] = parseInt(id);
-				});
+          return {
+            name,
+            id,
+            total,
+            numberOfSales,
+            totalHours,
+            avgPerHour
+          };
+        }).filter(p => p.total > 0);
 
 				const filteredSales = salesRecords.filter(record =>
           selectedPeople.includes(record.sales_person_id.toString()) &&
@@ -503,18 +533,15 @@
           return accumulator + sale.item_price;
         }, 0);
 
-				const categories = filteredData.map(([name]) => name);
-				const data = filteredData.map(([name, total]) => {
-          const id = nameToSalesPersonId[name];
-          const count = salesRecords.filter(record =>
-            record.sales_person_id === id &&
-            selectedItems.includes(record.item_id.toString())
-          ).length;
-          return {
-            y: total,
-            custom: { count: count }
-          };
-        });
+				const categories = filteredData.map(p => p.name);
+				const data = filteredData.map(p => ({
+          y: p.total,
+          custom: {
+            count: p.numberOfSales,
+            hours: p.totalHours,
+            avg: p.avgPerHour
+          }
+        }));
 
 				Highcharts.chart('total-sales-chart', {
 					chart: {
@@ -578,10 +605,29 @@
                 formatter: function() {
                   const sales = '$' + Highcharts.numberFormat(this.y, 0, '.', ',');
                   const count = this.point.custom?.count || 0;
-                  return `<div style="text-align: center;">
-                    <div>${sales}</div>
-                    <div style="font-size: 12px; color: #777;">${count.toLocaleString()} sale${count === 1 ? '' : 's'}</div>
-                  </div>`;
+                  const hours = this.point.custom?.hours || 0;
+                  const avg = this.point.custom?.avg || 0;
+                  
+                  let labelString = `<div style="text-align: center;">
+                      <div>${sales}</div>
+                      <div style="font-size: 12px; color: #777;">
+                        ${count.toLocaleString()} sale${count === 1 ? '' : 's'}
+                      </div>
+                    </div>`;
+                  
+                  if(avg > 0){
+                    labelString = `<div style="text-align: center;">
+                      <div>${sales}</div>
+                      <div style="font-size: 12px; color: #777;">
+                        ${count.toLocaleString()} sale${count === 1 ? '' : 's'}
+                      </div>
+                      <div style="font-size: 12px; color: #007bff;">
+                        $${avg.toFixed(2)}/hr
+                      </div>
+                    </div>`;
+                  }
+
+                  return labelString;
                 },
                 style: {
                   color: '#333',
@@ -604,32 +650,36 @@
 				});
 
         $('#export-total-sales-chart').off('click').on('click', async () => {
-          
           const startDate = "<%= @start_date.strftime('%m/%d/%Y') %>";
           const endDate = "<%= @end_date.strftime('%m/%d/%Y') %>";
           
           // Prepare JSON data for Excel
-          const excelData = categories.map((cat, idx) => {
-            const point = data[idx] || {};
-            return {
-              salesPerson: cat,
-              totalSales: point.y,
-              numberOfSales: point.custom?.count
-            };
-          });
+          const excelData = filteredData.map(p => ({
+            salesPerson: p.name,
+            totalSales: p.total,
+            numberOfSales: p.numberOfSales,
+            totalHours: p.totalHours,
+            avgPerHour: p.avgPerHour
+          }));
 
-          if (excelData.length === 0) {
-            return;
-          }
+          if (excelData.length === 0) return;
 
           // Create workbook & worksheet
           const wb = new ExcelJS.Workbook();
           const ws = wb.addWorksheet('Total Sales');
 
           // Row 1: Merged title
-          ws.mergeCells('A1:C1');
+          ws.mergeCells('A1:E1');
           const titleCell = ws.getCell('A1');
+          
           titleCell.value = `Total Sales from ${startDate} to ${endDate}`;
+          let fileName = `total_sales_${startDate.replace(/\//g, '-')}_to_${endDate.replace(/\//g, '-')}.xlsx`;
+          
+          if(startDate === endDate){
+            titleCell.value = `Total Sales for ${startDate}`;
+            fileName = `total_sales_for_${startDate.replace(/\//g, '-')}.xlsx`;
+          } 
+            
           titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
           titleCell.font = { bold: true, size: 12 };
 
@@ -637,7 +687,7 @@
 
           // Row 3: headers
           const headerRow = ws.getRow(3);
-          headerRow.values = ['Sales Person', 'Total Sales ($)', 'Number of Sales'];
+          headerRow.values = ['Sales Person','Number of Sales','Total Sales ($)','Hours on Sales Floor', 'Avg per Hour ($)'];
           headerRow.font = { bold: true };
           headerRow.alignment = { horizontal: 'center', vertical: 'middle' };
 
@@ -648,16 +698,19 @@
           excelData.forEach(r => {
             const row = ws.getRow(rowIndex);
             row.getCell(1).value = r.salesPerson;
-            row.getCell(2).value = r.totalSales;
-            row.getCell(3).value = r.numberOfSales;
+            row.getCell(2).value = r.numberOfSales;
+            row.getCell(3).value = r.totalSales;
+            row.getCell(4).value = r.totalHours;
+            row.getCell(5).value = r.avgPerHour;
 
             // Align all three cells center
-            [1,2,3].forEach(c => {
+            [1,2,3,4,5].forEach(c => {
               row.getCell(c).alignment = { horizontal: 'center', vertical: 'middle' };
             });
 
-            // Format currency for column 2
-            row.getCell(2).numFmt = '"$"#,##0.00;[Red]-"$"#,##0.00';
+            // Format currency for column 3 & 5
+            row.getCell(3).numFmt = '"$"#,##0.00;[Red]-"$"#,##0.00';
+            row.getCell(5).numFmt = '"$"#,##0.00;[Red]-"$"#,##0.00';
 
             row.commit();
             rowIndex++;
@@ -667,6 +720,8 @@
           ws.getColumn(1).width = 25;
           ws.getColumn(2).width = 18;
           ws.getColumn(3).width = 18;
+          ws.getColumn(4).width = 25;
+          ws.getColumn(5).width = 18;
 
           // Format Total Sales ($) as currency
           for (let i = 0; i < excelData.length; i++) {
@@ -679,7 +734,6 @@
 
           // Generate file and trigger download
           const buf = await wb.xlsx.writeBuffer();
-          const fileName = `total_sales_${startDate.replace(/\//g, '-')}_to_${endDate.replace(/\//g, '-')}.xlsx`;
           saveAs(new Blob([buf], { type: 'application/octet-stream' }), fileName);
         });
     	}
@@ -705,6 +759,7 @@
 				tbody.innerHTML = '';
 
 				let overallTotal = 0;
+        let overallHours = 0;
 
         // First sort the records
         const sortedRecords = filteredRecords.sort((a, b) => {
@@ -729,11 +784,27 @@
 
 				const uniqueDates = Object.keys(groupedByDate).sort();
 
-				uniqueDates.forEach(date => {
+				// --- Calculate total hours worked across matching shift dates ---
+        const shiftDates = uniqueDates.map(d =>
+          luxon.DateTime.fromFormat(d, 'MM/dd/yyyy').toISODate()
+        );
+
+        const personShifts = shifts.filter(
+          s =>
+            s.sales_person_id == salesPersonId &&
+            shiftDates.includes(luxon.DateTime.fromISO(s.shift_date).toISODate())
+        );
+
+        const totalHours = personShifts.reduce(
+          (sum, s) => sum + (parseFloat(s.sales_floor_hours) || 0),
+          0
+        );
+        
+        uniqueDates.forEach(date => {
 					let dailyTotal = 0;
 					groupedByDate[date].forEach(record => {
 						
-						const itemRecord = Items.find(
+						const itemRecord = items.find(
 							item => item.id === record.item_id
 						);
 
@@ -748,6 +819,16 @@
 						overallTotal += parseFloat(record.item_price);
 					});
 
+          // --- Find matching shift for that date ---
+          const isoDate = luxon.DateTime.fromFormat(date, 'MM/dd/yyyy').toISODate();
+          const dayShift = shifts.find(
+            s => s.sales_person_id == salesPersonId &&
+                luxon.DateTime.fromISO(s.shift_date).toISODate() === isoDate
+          );
+          const dayHours = dayShift ? parseFloat(dayShift.sales_floor_hours || 0) : 0;
+          const dayAvg = dayHours > 0 ? dailyTotal / dayHours : 0;
+          overallHours += dayHours;
+
 					// Only show day total if there’s more than one day of data
 					if (uniqueDates.length > 1) {
             //add a row for spacing
@@ -757,12 +838,26 @@
             `;
             tbody.appendChild(spaceRow);
             
+            if(dayHours > 0){
+              const hoursOnFloorRow = document.createElement('tr');
+              hoursOnFloorRow.classList.add('daily-total-row');
+              hoursOnFloorRow.innerHTML = `
+                <td colspan="2" style="text-align: right; font-weight: bold;">
+                  Hours on Sales Floor
+                </td>
+                <td><strong>${dayHours}</strong></td>
+              `;
+              tbody.appendChild(hoursOnFloorRow);
+            }
+            
             const dailyTotalRow = document.createElement('tr');
 						dailyTotalRow.classList.add('daily-total-row');
 						dailyTotalRow.innerHTML = `
-							<td colspan="2" style="text-align: right; font-weight: bold;">Day Total</td>
-							<td><strong>$${dailyTotal.toLocaleString()}</strong></td>
-						`;
+              <td colspan="2" style="text-align: right; font-weight: bold;">
+                Day Total
+              </td>
+              <td><strong>$${dailyTotal.toLocaleString()}</strong></td>
+            `;
             addPadding(dailyTotalRow);
 						tbody.appendChild(dailyTotalRow);
 					}
@@ -773,10 +868,23 @@
           <td colspan="3"></td>
           `;
           tbody.appendChild(spaceRow);
-
 				});
 
-				// Overall total
+				if(overallHours > 0){
+          const totalHoursOnFloorRow = document.createElement('tr');
+          totalHoursOnFloorRow.classList.add('daily-total-row');
+          totalHoursOnFloorRow.innerHTML = `
+            <td colspan="2" style="text-align: right; font-weight: bold;">
+              Total Hours on Sales Floor
+            </td>
+            <td><strong>${overallHours}</strong></td>
+          `;
+          tbody.appendChild(totalHoursOnFloorRow);
+        }
+        
+        const totalAvg = (overallTotal / overallHours).toFixed(2);
+        
+        // Overall total
 				const totalRow = document.createElement('tr');
 				totalRow.innerHTML = `
 					<td colspan="2" style="text-align: right;"><strong>Grand Total</strong></td>
@@ -784,6 +892,15 @@
 				`;
         addPadding(totalRow);
 				tbody.appendChild(totalRow);
+
+        // Overall average
+				const avgRow = document.createElement('tr');
+				avgRow.innerHTML = `
+					<td colspan="2" style="text-align: right;"><strong>Average Per Hour</strong></td>
+					<td><strong>$${totalAvg.toLocaleString()}/hr</strong></td>
+				`;
+        addPadding(avgRow);
+				tbody.appendChild(avgRow);
 
 				const modal = new bootstrap.Modal(document.getElementById('totalSalesModal'));
 				modal.show();
