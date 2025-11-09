@@ -1,6 +1,6 @@
 class SalesPerson < ApplicationRecord
   validate :unique_sales_person
-  before_destroy :find_sales_records
+  before_destroy :find_records
   validates :first_name, presence: true
   validates :last_name, presence: true
   
@@ -9,9 +9,9 @@ class SalesPerson < ApplicationRecord
 
   private 
 
-  def find_sales_records
-    if sales_records.exists?
-      errors.add(:base, "There are Sales Records for this Sales Person")
+  def find_records
+    if sales_records.exists? or shifts.exists?
+      errors.add(:base, "There are Sales Records or Shifts for this Sales Person")
       throw(:abort)
     end
   end

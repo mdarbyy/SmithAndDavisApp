@@ -3,7 +3,7 @@
 
   <td>
     <div class="d-flex align-items-center">  
-      <% unless sales_person.sales_records.present? %>
+      <% unless sales_person.sales_records.present? or sales_person.shifts.present? %>
         <button class="btn btn-delete" type="button"
           data-entity="sales_people"
           data-entity-name="Sales Person"
