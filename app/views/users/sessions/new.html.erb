@@ -13,7 +13,7 @@
 
   <% unless User.exists? %>
     <div class="text-center mt-3">
-      Dont have an account? <%= link_to "Sign up", new_registration_path(resource_name), class: "link-primary", style:"color: var(--main-color) !important" %> 
+      Dont have an account? <%= link_to "Sign up", new_registration_path(resource_name), class: "link-primary" %> 
     </div>
   <% end %>
 <% end %>

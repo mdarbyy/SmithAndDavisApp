@@ -20,6 +20,9 @@ class Users::RegistrationsController < Devise::RegistrationsController
     elsif sign_up_params[:first_name].blank? or sign_up_params[:last_name].blank?
       flash[:danger] = "You must fill out your name to create an account"
       redirect_to new_user_registration_path
+    elsif sign_up_params[:password] != sign_up_params[:password_confirmation]
+      flash[:danger] = "Passwords do not match"
+      redirect_to new_user_registration_path
     else
       build_resource(sign_up_params)
       resource.save
