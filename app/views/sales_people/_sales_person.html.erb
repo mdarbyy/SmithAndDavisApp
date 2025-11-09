@@ -2,26 +2,25 @@
   <td><%= link_to sales_person.first_name + " " + sales_person.last_name, edit_sales_person_path(sales_person), class: "nav-link" %></td>
 
   <td>
-    <% if sales_person.sales_records.present? %>
-      <%= button_to 'View Sales Records', sales_person_path(sales_person), method: :get, data: {turbo: false}, class: 'btn btn-main', style:"margin-top: 0;" %>
-    <% end %>
-  </td>
-
-  <td>
-    <% if sales_person.shifts.present? %>
-      <%= button_to 'View Shifts', show_shifts_path(sales_person), method: :get, data: {turbo: false}, class: 'btn btn-main', style:"margin-top: 0;" %>
-    <% end %>
-  </td>
-  
-  <td>
-    <% unless sales_person.sales_records.present? %>
-      <button class="btn btn-delete" type="button"
-        data-entity="sales_people"
-        data-entity-name="Sales Person"
-        data-id="<%= sales_person.id %>"
-        onclick="deleteEntity(event)">
-        Delete
-      </button>
-    <% end %>
+    <div class="d-flex align-items-center">  
+      <% unless sales_person.sales_records.present? %>
+        <button class="btn btn-delete" type="button"
+          data-entity="sales_people"
+          data-entity-name="Sales Person"
+          data-id="<%= sales_person.id %>"
+          onclick="deleteEntity(event)">
+          Delete
+        </button>
+      <% else %>
+        <% if sales_person.sales_records.present? %>
+          <%= button_to 'View Sales Records', sales_person_path(sales_person),
+          method: :get, data: { turbo: false }, class: 'btn btn-main mt-0' %>
+        <% end %>
+        <% if sales_person.shifts.present? %>
+          <%= button_to 'View Shifts', show_shifts_path(sales_person),
+          method: :get, data: { turbo: false }, class: 'btn btn-main mt-0 ms-2' %>
+        <% end %>
+      <% end %>
+    </div>
   </td>
 </tr>
