@@ -14,6 +14,7 @@ Rails.application.routes.draw do
 
     post 'admin/users', to: 'users#create', as: 'admin_create_user'
     get 'static_pages/dashboard', to: 'static_pages#dashboard', as: 'dashboard'
+    get 'sales_people/:id/show_shifts', to: 'sales_people#show_shifts', as: 'show_shifts'
     post "/create_multiple_sales_records", to: "sales_records#create_multiple_sales_records"
   end
 

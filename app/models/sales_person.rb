@@ -5,6 +5,7 @@ class SalesPerson < ApplicationRecord
   validates :last_name, presence: true
   
   has_many :sales_records
+  has_many :shifts
 
   private 
 

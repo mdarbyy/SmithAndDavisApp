@@ -6,6 +6,12 @@
       <%= button_to 'View Sales Records', sales_person_path(sales_person), method: :get, data: {turbo: false}, class: 'btn btn-main', style:"margin-top: 0;" %>
     <% end %>
   </td>
+
+  <td>
+    <% if sales_person.shifts.present? %>
+      <%= button_to 'View Shifts', show_shifts_path(sales_person), method: :get, data: {turbo: false}, class: 'btn btn-main', style:"margin-top: 0;" %>
+    <% end %>
+  </td>
   
   <td>
     <% unless sales_person.sales_records.present? %>

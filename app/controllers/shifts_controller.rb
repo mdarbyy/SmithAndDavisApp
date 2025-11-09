@@ -27,6 +27,7 @@ class ShiftsController < ApplicationController
 
   # GET /shifts/1/edit
   def edit
+    session[:return_to] = request.referer
   end
 
   # POST /shifts or /shifts.json
@@ -54,7 +55,7 @@ class ShiftsController < ApplicationController
     end
     
     if @shift.update(shift_params)
-      redirect_to shifts_path, success: 'Shift was updated'
+      redirect_to(session.delete(:return_to) || shifts_path, success: 'Shift was updated')
     else
       flash.now[:danger] = @shift.errors.full_messages.first
       render :edit, status: :unprocessable_entity

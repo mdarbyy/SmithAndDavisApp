@@ -1,8 +1,5 @@
 class Shift < ApplicationRecord
   belongs_to :sales_person
-
-  belongs_to :sales_person
-
   validates :shift_date, presence: true
   validates :sales_floor_hours,presence: true, numericality: { greater_than_or_equal_to: 0.1, less_than_or_equal_to: 24 }
 

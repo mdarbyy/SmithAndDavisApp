@@ -1,5 +1,5 @@
 class SalesPeopleController < ApplicationController
-  before_action :set_sales_person, only: %i[ show edit update destroy ]
+  before_action :set_sales_person, only: %i[ show show_shifts edit update destroy ]
 
   # GET /sales_people or /sales_people.json
   def index
@@ -25,6 +25,10 @@ class SalesPeopleController < ApplicationController
       format.html
       format.js
     end
+  end
+
+  def show_shifts
+    @shifts = Shift.where(sales_person_id: @sales_person.id).order(id: :desc)
   end
 
   # GET /sales_people/new
