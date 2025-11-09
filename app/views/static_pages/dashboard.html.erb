@@ -546,7 +546,11 @@
 				Highcharts.chart('total-sales-chart', {
 					chart: {
 						type: 'column',
-            marginTop: 130
+            marginTop: 130,
+            scrollablePlotArea: {
+              minWidth: categories.length * 100,
+              scrollPositionX: 1
+            }
 					},
 					title: {
             useHTML: true,

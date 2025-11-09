@@ -199,7 +199,9 @@
         flex: 1;
         width: 100%;
         min-height: 0;
-        height: calc(100vh - 180px);
+        height: calc(100vh - 200px);
+        overflow-x: auto !important;   /* horizontal scrollbar allowed */
+        overflow-y: hidden; /* vertical scroll not needed */
       }
 
       .authenticated {
@@ -310,7 +312,7 @@
         height: calc(100vh - 155px);
         display: flex;
         flex-direction: column;
-        overflow: hidden;
+        overflow-y: hidden;
       }
 
       .datepicker table tr td.active, .datepicker table tr td.active:hover, .datepicker table tr td span.active, .datepicker table tr td span.active:hover, .bootstrap-select .dropdown-menu li a:active {
