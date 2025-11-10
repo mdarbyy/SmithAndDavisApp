@@ -952,17 +952,19 @@
         addPadding(totalRow);
 				tbody.appendChild(totalRow);
 
-        const totalAvg = (overallTotal / overallSalesHours).toFixed(2);
+        if(overallSalesHours > 0){
+          const totalAvg = (overallTotal / overallSalesHours).toFixed(2);
 
-        // Overall average
-				const avgRow = document.createElement('tr');
-				avgRow.innerHTML = `
-					<td colspan="2" style="text-align: right;"><strong>Average Per Hour</strong></td>
-					<td><strong>$${totalAvg.toLocaleString()}/hr</strong></td>
-				`;
-        addPadding(avgRow);
-				tbody.appendChild(avgRow);
-
+          // Overall average
+          const avgRow = document.createElement('tr');
+          avgRow.innerHTML = `
+            <td colspan="2" style="text-align: right;"><strong>Average Per Hour</strong></td>
+            <td><strong>$${totalAvg.toLocaleString()}/hr</strong></td>
+          `;
+          addPadding(avgRow);
+          tbody.appendChild(avgRow);
+        }
+        
 				const modal = new bootstrap.Modal(document.getElementById('totalSalesModal'));
 				modal.show();
 			}
