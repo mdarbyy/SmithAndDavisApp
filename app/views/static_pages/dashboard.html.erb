@@ -176,11 +176,10 @@
               role="tabpanel"
               aria-labelledby="total-sales-tab">
               
-              <% if current_user.show_export_buttons %>
-                <div class="mb-1 d-flex justify-content-end">
-                  <button id="export-total-sales-chart" class="btn btn-main">Export to Excel</button>
-                </div>
-              <% end %>
+              <div class="mb-1 d-flex justify-content-end">
+                <button id="export-total-sales-chart" class="btn btn-main">Export to Excel</button>
+              </div>
+              
               <div id="total-sales-chart"></div>
             </div>
 
@@ -188,11 +187,11 @@
               id="item-breakdown"
               role="tabpanel"
               aria-labelledby="item-breakdown-tab">
-              <% if current_user.show_export_buttons %>
-                <div class="mb-1 d-flex justify-content-end">
-                  <button id="export-item-breakdown-table" class="btn btn-main">Export to Excel</button>
-                </div>
-              <% end %>
+              
+              <div class="mb-1 d-flex justify-content-end">
+                <button id="export-item-breakdown-table" class="btn btn-main">Export to Excel</button>
+              </div>
+              
               <div class="scrollable-table dashboard-table show-scrollbar">
                 <table class="table content" id="itemBreakdownTable">
                   <thead>
@@ -502,13 +501,16 @@
             salesDates.includes(shift.shift_date)
           );
 
-          const totalHours = personShifts.reduce((sum, shift) => {
+          const totalSalesHours = personShifts.reduce((sum, shift) => {
             return sum + (parseFloat(shift.sales_floor_hours) || 0);
           }, 0);
 
-          const avgPerHour = totalHours > 0 ? totalSales / totalHours : 0;
+          const totalProjectHours = personShifts.reduce((sum, shift) => {
+            return sum + (parseFloat(shift.project_hours) || 0);
+          }, 0);
 
-          // Keep your old logic for item totals if needed
+          const avgPerHour = totalSalesHours > 0 ? totalSales / totalSalesHours : 0;
+
           const itemTotals = totalsByPerson[name] || {};
           const total = Object.entries(itemTotals)
             .filter(([itemName]) => selectedItemNames.includes(itemName))
@@ -517,12 +519,16 @@
           return {
             name,
             id,
-            total,
+            totalSales,
+            totalProjectHours,
             numberOfSales,
-            totalHours,
+            totalSalesHours,
             avgPerHour
           };
-        }).filter(p => p.total > 0);
+        }).filter(p => p.totalSales > 0);
+
+        // Sort by total sales (highest first)
+        filteredData.sort((a, b) => b.totalSales - a.totalSales);
 
 				const filteredSales = salesRecords.filter(record =>
           selectedPeople.includes(record.sales_person_id.toString()) &&
@@ -535,10 +541,11 @@
 
 				const categories = filteredData.map(p => p.name);
 				const data = filteredData.map(p => ({
-          y: p.total,
+          y: p.totalSales,
           custom: {
-            count: p.numberOfSales,
-            hours: p.totalHours,
+            project_hours: p.totalProjectHours,
+            number_of_sales: p.numberOfSales,
+            sales_hours: p.totalSalesHours,
             avg: p.avgPerHour
           }
         }));
@@ -608,14 +615,15 @@
                 useHTML: true,
                 formatter: function() {
                   const sales = '$' + Highcharts.numberFormat(this.y, 0, '.', ',');
-                  const count = this.point.custom?.count || 0;
-                  const hours = this.point.custom?.hours || 0;
+                  const number_of_sales = this.point.custom?.number_of_sales || 0;
+                  const project_hours = this.point.custom?.project_hours || 0;
+                  const sales_hours = this.point.custom?.sales_hours || 0;
                   const avg = this.point.custom?.avg || 0;
                   
                   let labelString = `<div style="text-align: center;">
                       <div>${sales}</div>
                       <div style="font-size: 12px; color: #777;">
-                        ${count.toLocaleString()} sale${count === 1 ? '' : 's'}
+                        ${number_of_sales.toLocaleString()} sale${number_of_sales === 1 ? '' : 's'}
                       </div>
                     </div>`;
                   
@@ -623,7 +631,7 @@
                     labelString = `<div style="text-align: center;">
                       <div>${sales}</div>
                       <div style="font-size: 12px; color: #777;">
-                        ${count.toLocaleString()} sale${count === 1 ? '' : 's'}
+                        ${number_of_sales.toLocaleString()} sale${number_of_sales === 1 ? '' : 's'}
                       </div>
                       <div style="font-size: 12px; color: #007bff;">
                         $${avg.toFixed(2)}/hr
@@ -660,10 +668,11 @@
           // Prepare JSON data for Excel
           const excelData = filteredData.map(p => ({
             salesPerson: p.name,
-            totalSales: p.total,
-            numberOfSales: p.numberOfSales,
-            totalHours: p.totalHours,
-            avgPerHour: p.avgPerHour
+            totalProjectHours: p.totalProjectHours,
+            totalSalesHours: p.totalSalesHours,
+            totalSales: p.totalSales,
+            avgPerHour: p.avgPerHour,
+            numberOfSales: p.numberOfSales
           }));
 
           if (excelData.length === 0) return;
@@ -673,7 +682,7 @@
           const ws = wb.addWorksheet('Total Sales');
 
           // Row 1: Merged title
-          ws.mergeCells('A1:E1');
+          ws.mergeCells('A1:F1');
           const titleCell = ws.getCell('A1');
           
           titleCell.value = `Total Sales from ${startDate} to ${endDate}`;
@@ -687,28 +696,43 @@
           titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
           titleCell.font = { bold: true, size: 12 };
 
-          // Row 2: blank (ExcelJS will leave empty row if we don't add anything)
+          // Row 2: Total Sales summary
+          ws.mergeCells('A2:F2');
+          const totalSalesCell = ws.getCell('A2');
+          totalSalesCell.value = `Total Sales: $${totalSales.toLocaleString()}`;
+          totalSalesCell.alignment = { horizontal: 'center', vertical: 'middle' };
+          totalSalesCell.font = { bold: true };
 
-          // Row 3: headers
-          const headerRow = ws.getRow(3);
-          headerRow.values = ['Sales Person','Number of Sales','Total Sales ($)','Hours on Sales Floor', 'Avg per Hour ($)'];
+          // Row 3: Number of sales
+          ws.mergeCells('A3:F3');
+          const totalCountCell = ws.getCell('A3');
+          totalCountCell.value = `Total Number of Sales: ${filteredSales.length.toLocaleString()}`;
+          totalCountCell.alignment = { horizontal: 'center', vertical: 'middle' };
+          totalCountCell.font = { bold: true };
+
+          // Row 4: Blank
+
+          // Row 5: Headers
+          const headerRow = ws.getRow(5);
+          headerRow.values = ['Sales Person','Number of Sales','Total Sales ($)','Sales Floor Hours','Avg per Hour ($)','Project Hours'];
           headerRow.font = { bold: true };
           headerRow.alignment = { horizontal: 'center', vertical: 'middle' };
 
-          // Row 4: blank
-
-          // Starting at row 5, insert data
-          let rowIndex = 5;
+          // Row 6: Blank
+          
+          // Starting at row 7, insert data
+          let rowIndex = 7;
           excelData.forEach(r => {
             const row = ws.getRow(rowIndex);
             row.getCell(1).value = r.salesPerson;
             row.getCell(2).value = r.numberOfSales;
             row.getCell(3).value = r.totalSales;
-            row.getCell(4).value = r.totalHours;
+            row.getCell(4).value = r.totalSalesHours;
             row.getCell(5).value = r.avgPerHour;
+            row.getCell(6).value = r.totalProjectHours;
 
-            // Align all three cells center
-            [1,2,3,4,5].forEach(c => {
+            // Align all cells center
+            [1,2,3,4,5,6].forEach(c => {
               row.getCell(c).alignment = { horizontal: 'center', vertical: 'middle' };
             });
 
@@ -722,10 +746,11 @@
 
           // Set column widths
           ws.getColumn(1).width = 25;
-          ws.getColumn(2).width = 18;
-          ws.getColumn(3).width = 18;
+          ws.getColumn(2).width = 25;
+          ws.getColumn(3).width = 25;
           ws.getColumn(4).width = 25;
-          ws.getColumn(5).width = 18;
+          ws.getColumn(5).width = 25;
+          ws.getColumn(6).width = 25;
 
           // Format Total Sales ($) as currency
           for (let i = 0; i < excelData.length; i++) {
@@ -763,7 +788,8 @@
 				tbody.innerHTML = '';
 
 				let overallTotal = 0;
-        let overallHours = 0;
+        let overallProjectHours = 0;
+        let overallSalesHours = 0;
 
         // First sort the records
         const sortedRecords = filteredRecords.sort((a, b) => {
@@ -795,12 +821,17 @@
 
         const personShifts = shifts.filter(
           s =>
-            s.sales_person_id == salesPersonId &&
-            shiftDates.includes(luxon.DateTime.fromISO(s.shift_date).toISODate())
+          s.sales_person_id == salesPersonId &&
+          shiftDates.includes(luxon.DateTime.fromISO(s.shift_date).toISODate())
         );
 
-        const totalHours = personShifts.reduce(
+        const totalSalesHours = personShifts.reduce(
           (sum, s) => sum + (parseFloat(s.sales_floor_hours) || 0),
+          0
+        );
+
+        const totalProjectHours = personShifts.reduce(
+          (sum, s) => sum + (parseFloat(s.project_hours) || 0),
           0
         );
         
@@ -827,11 +858,13 @@
           const isoDate = luxon.DateTime.fromFormat(date, 'MM/dd/yyyy').toISODate();
           const dayShift = shifts.find(
             s => s.sales_person_id == salesPersonId &&
-                luxon.DateTime.fromISO(s.shift_date).toISODate() === isoDate
+            luxon.DateTime.fromISO(s.shift_date).toISODate() === isoDate
           );
-          const dayHours = dayShift ? parseFloat(dayShift.sales_floor_hours || 0) : 0;
-          const dayAvg = dayHours > 0 ? dailyTotal / dayHours : 0;
-          overallHours += dayHours;
+          const daySalesHours = dayShift ? parseFloat(dayShift.sales_floor_hours || 0) : 0;
+          const dayProjectHours = dayShift ? parseFloat(dayShift.project_hours || 0) : 0;
+          const dayAvg = daySalesHours > 0 ? dailyTotal / daySalesHours : 0;
+          overallProjectHours += dayProjectHours;
+          overallSalesHours += daySalesHours;
 
 					// Only show day total if there’s more than one day of data
 					if (uniqueDates.length > 1) {
@@ -842,14 +875,26 @@
             `;
             tbody.appendChild(spaceRow);
             
-            if(dayHours > 0){
+            if(dayProjectHours > 0){
+              const projectHoursRow = document.createElement('tr');
+              projectHoursRow.classList.add('daily-total-row');
+              projectHoursRow.innerHTML = `
+                <td colspan="2" style="text-align: right; font-weight: bold;">
+                  Project Hours
+                </td>
+                <td><strong>${dayProjectHours}</strong></td>
+              `;
+              tbody.appendChild(projectHoursRow);
+            }
+            
+            if(daySalesHours > 0){
               const hoursOnFloorRow = document.createElement('tr');
               hoursOnFloorRow.classList.add('daily-total-row');
               hoursOnFloorRow.innerHTML = `
                 <td colspan="2" style="text-align: right; font-weight: bold;">
-                  Hours on Sales Floor
+                  Sales Floor Hours
                 </td>
-                <td><strong>${dayHours}</strong></td>
+                <td><strong>${daySalesHours}</strong></td>
               `;
               tbody.appendChild(hoursOnFloorRow);
             }
@@ -874,19 +919,29 @@
           tbody.appendChild(spaceRow);
 				});
 
-				if(overallHours > 0){
-          const totalHoursOnFloorRow = document.createElement('tr');
-          totalHoursOnFloorRow.classList.add('daily-total-row');
-          totalHoursOnFloorRow.innerHTML = `
+        if(overallProjectHours > 0){
+          const totalProjectHoursRow = document.createElement('tr');
+          totalProjectHoursRow.classList.add('daily-total-row');
+          totalProjectHoursRow.innerHTML = `
             <td colspan="2" style="text-align: right; font-weight: bold;">
-              Total Hours on Sales Floor
+              Total Project Hours
             </td>
-            <td><strong>${overallHours}</strong></td>
+            <td><strong>${overallProjectHours}</strong></td>
           `;
-          tbody.appendChild(totalHoursOnFloorRow);
+          tbody.appendChild(totalProjectHoursRow);
         }
-        
-        const totalAvg = (overallTotal / overallHours).toFixed(2);
+
+				if(overallSalesHours > 0){
+          const totalSalesFloorHoursRow = document.createElement('tr');
+          totalSalesFloorHoursRow.classList.add('daily-total-row');
+          totalSalesFloorHoursRow.innerHTML = `
+            <td colspan="2" style="text-align: right; font-weight: bold;">
+              Total Sales Floor Hours
+            </td>
+            <td><strong>${overallSalesHours}</strong></td>
+          `;
+          tbody.appendChild(totalSalesFloorHoursRow);
+        }
         
         // Overall total
 				const totalRow = document.createElement('tr');
@@ -896,6 +951,8 @@
 				`;
         addPadding(totalRow);
 				tbody.appendChild(totalRow);
+
+        const totalAvg = (overallTotal / overallSalesHours).toFixed(2);
 
         // Overall average
 				const avgRow = document.createElement('tr');
