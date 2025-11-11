@@ -443,10 +443,7 @@
           headerRow.font = { bold: true };
           headerRow.alignment = { horizontal: 'center', vertical: 'middle' };
 
-          // --- Row 4: blank spacer ---
-          ws.addRow([]);
-
-          // --- Row 5+: table data ---
+          // --- Row 4+: table data ---
           rows.forEach(r => {
             const row = ws.addRow([r.item, r.sold, r.amount]);
             row.alignment = { horizontal: 'center', vertical: 'middle' };
@@ -718,8 +715,6 @@
           headerRow.font = { bold: true };
           headerRow.alignment = { horizontal: 'center', vertical: 'middle' };
 
-          // Row 6: Blank
-          
           // Starting at row 6, insert data
           let rowIndex = 6;
           excelData.forEach(r => {
