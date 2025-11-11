@@ -36,7 +36,8 @@ class ShiftsController < ApplicationController
     @shift = Shift.new(
       sales_person_id: shift_params[:sales_person_id].to_i,
       shift_date: Date.strptime(shift_params[:shift_date], '%m/%d/%Y'),
-      sales_floor_hours: shift_params[:sales_floor_hours].to_f
+      sales_floor_hours: shift_params[:sales_floor_hours].to_f,
+      project_hours: shift_params[:project_hours].to_f
     )
 
     if @shift.save
